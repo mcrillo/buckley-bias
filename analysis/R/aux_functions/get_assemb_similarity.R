@@ -1,5 +1,23 @@
+### Description
+# Calculating similarity index (based on Chao) for assemblages of Re-sampling X Buckley Collection X ForCenS
+# creates: output/assemb_similar_chao.xlsx (list)
 
-get_assemb_similarity <- function(assemb_counts_df, samples){
+### Usage
+# get_assemb_similarity(assemb_counts_df, samples, overwrite)
+
+### Arguments
+# assemb_counts_df: 
+# samples: re-samples numbers
+# overwrite : TRUE or FALSE (if the output file already exist, do you want to re0run the function and overwrite it?)
+
+get_assemb_similarity <- function(assemb_counts_df, samples, overwrite){
+
+  if(file.exists("output/assemb_similar_chao.xlsx") && overwrite == FALSE){
+    
+    assemb_sim_list <- function_read_list("output/assemb_similar_chao.xlsx")
+    return(assemb_sim_list)
+    
+  }else{
 
       ### Chao - SpadeR package
       
@@ -73,7 +91,7 @@ get_assemb_similarity <- function(assemb_counts_df, samples){
       function_write_list(assemb_sim_list, "output/assemb_similar_chao.xlsx")
         
       return(assemb_sim_list)
-        
+  }# else
 }
 
 

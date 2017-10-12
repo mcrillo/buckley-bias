@@ -1,5 +1,21 @@
+### Description
+# 
 
-get_resamples_info <- function(wands_df, morpho_df){
+### Usage
+# table <- get_resamples_info(wands_df, morpho_df, overwrite = TRUE)
+
+### Arguments
+# wands_df	: 
+# morpho_df	: 
+# overwrite : TRUE or FALSE (if the output file already exist, do you want to re0run the function and overwrite it?)
+
+get_resamples_info <- function(wands_df, morpho_df, overwrite){
+
+  if(file.exists("data/resample_info.csv") && overwrite == FALSE){
+      sample_table <- read.csv("data/resample_info.csv", header = TRUE)
+      return(sample_table)
+    
+  }else{
 
       # Organizing data
       wands_df$Sample.depth.MIN..cm.<-as.numeric(wands_df$Sample.depth.MIN..cm.) # NAs
@@ -52,4 +68,6 @@ get_resamples_info <- function(wands_df, morpho_df){
       write.csv(sample_ssp_table, file = "data/resample_info_ssp.csv",row.names=FALSE)
       
       return(sample_table)
+      
+  } # else
 }
