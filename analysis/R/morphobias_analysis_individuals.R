@@ -5,13 +5,6 @@
 ## Creates: 
 ##
 
-rm(list=ls())
-library(ggplot2)
-library(latticeExtra)
-library(RColorBrewer) # colours of plots
-
-setwd("/Users/marinacostarillo/Google Drive/DOUTORADO/R_data")
-
 df.bias <- read.csv("Bias_analysis/data_morpho/bias_morpho_individuals.csv", header = TRUE, stringsAsFactors=FALSE)
 names(df.bias)
 

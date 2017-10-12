@@ -1,5 +1,6 @@
 ### Description
 # 
+# creates data/resample_info.csv & data/resample_info_morpho.csv     
 
 ### Usage
 # table <- get_resamples_info(wands_df, morpho_df, overwrite = TRUE)
@@ -53,9 +54,9 @@ get_resamples_info <- function(wands_df, morpho_df, overwrite){
       
       
       # Creating re-samples info table with names of the species measured for each sample
-      sample_ssp_table <- unique(morpho_sampled[,c("sample","total_ssp_morpho","species","total_ind","Lat.decimal","Long.decimal","Vessel","Collection.date","Museum.no.",
+      sample_ssp_table <- unique(morpho_sampled[,c("ZF.PF.no.","sample","total_ssp_morpho","species","total_ind","Lat.decimal","Long.decimal","Vessel","Collection.date","Museum.no.",
                                                    "Residue.OBD.IRN","Sea.Depth..m....modern.methods","Sample.depth.MIN..cm.","Sample.depth.MAX..cm.")])
-      names(sample_ssp_table) <- c("sample","total_ssp_morpho","species","total_ind","Lat", "Long","Vessel","Date","Museum_no","OBD_IRN", "Sea Depth", "cm_MIN", "cm_MAX")
+      names(sample_ssp_table) <- c("ZF.PF.no.","sample","total_ssp_morpho","species","total_ind_Buckley","Lat", "Long","Vessel","Date","Museum_no","OBD_IRN", "Sea Depth", "cm_MIN", "cm_MAX")
       
       
       # Samples that I chose to pick:
@@ -65,7 +66,7 @@ get_resamples_info <- function(wands_df, morpho_df, overwrite){
       sample_ssp_table <- sample_ssp_table[which(sample_ssp_table[,"sample"] %in% chosen),]
       
       write.csv(sample_table, file = "data/resample_info.csv",row.names=FALSE)
-      write.csv(sample_ssp_table, file = "data/resample_info_ssp.csv",row.names=FALSE)
+      write.csv(sample_ssp_table, file = "data/resample_info_morpho.csv",row.names=FALSE)
       
       return(sample_table)
       

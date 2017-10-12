@@ -1,0 +1,72 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fnil\fcharset0 Calibri;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17320\viewh9260\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs28 \cf0 Duplicates (same coordinates, same OBD Resudue.IRN)\
+\
+I have merged the morphological measurements with same coordinates in the Excel files. \
+FOLDER: 	ImagePro_RawData_dupli_merged\
+\
+sacculifer - OK\
+ZF6234 = ZF6234 + ZF7782\
+ZF6235 = ZF6235 + ZF6236\
+\
+ruber - OK\
+ZF6266 = ZF6266 + ZF7777 + ZF7778 + ZF7779\
+ZF6270 = ZF6270 + ZF6271 [OBS.: one had Fourier the other not - NA]\
+\
+menardii - OK\
+ZF5751 = ZF5751 + ZF5752\
+ZF5757 = ZF5757 + ZF5758\
+ZF7783 = ZF7783 + ZF7784 + ZF7785\
+\
+inflata - OK\
+ZF5982 = ZF5982 + ZF5983 [OBS.: one had Fourier the other not - NA]\
+ZF5986 = ZF5986 + ZF5987\
+ZF7772 = ZF7772 + ZF7773 + ZF7774\
+\
+truncatulinoides - OK\
+ZF7770 = ZF7770 + ZF7775 + ZF7776\
+\
+conglobatus - OK\
+ZF6316 = ZF6316 + ZF7069\
+\
+dehiscens - OK\
+ZF6723 = ZF6723 + ZF6724\
+ZF6725 = ZF6725 + ZF6726\
+ZF6727 = ZF6727 + ZF6728\
+ZF6729 = ZF6729 + ZF6730\
+\
+dutertrei / eggeri  - OK\
+ZF6406 = ZF6406 + ZF6407\
+ZF6423 = ZF6423 + ZF6424\
+\
+obliquiloculata - no duplicates! OK\
+\
+siphonifera / aequilateralis - OK\
+ZF6690 = ZF6690 + ZF6691\
+\
+pachyderma - OK\
+6010 = 6010 + 6013 + 6057 [OBS.: one had Fourier the other not - NA]\
+6019 = 6019 + 6020\
+6021 = 6021+ 6022 + 6023 + 6024 \
+6040 = 6040 + 6041 \
+6011 - deleted, more than one coordinate on the same slide\
+6012 - deleted, more than one coordinate on the same slide\
+6018 - deleted, duplicates within the same slide (different square numbers) - too confusing\
+6058 - deleted, duplicates within the same slide (different square numbers) - too confusing \
+\
+\
+R CODE:\
+\
+allDup <- function (value) \
+\{ \
+  duplicated(value) | duplicated(value, fromLast = TRUE) \
+\} \
+\
+\
+subset_buckley <- buckley_table[buckley_table[,c("Foram_no")] %in% foram_no,]\
+subset_buckley[allDup(subset_buckley[,"lat"]),]\
+  }

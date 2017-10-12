@@ -1,5 +1,10 @@
+### Description
+# Histograms (per sample) of relative abundances of 3 datasets (Boas, Buckley, ForCenS)
 
-### Histograms (per sample) of relative abundances of 3 datasets (Boas, Buckley, ForCenS)
+### Arguments
+# assemb_relat_df
+# resamples_df
+
 
 plot_abund_histograms <- function(assemb_relat_df,resamples_df){
 

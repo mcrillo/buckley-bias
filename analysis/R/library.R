@@ -12,3 +12,6 @@ library(matrixStats)
 library(reshape2) # function melt
 library(dplyr)
 library(SpadeR) # Chao assemblage similarities package
+library(stringr)
+library(latticeExtra)
+library(RColorBrewer) # colours of plots
