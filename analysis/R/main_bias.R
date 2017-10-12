@@ -18,7 +18,7 @@ cores10 <- c("#00b900","#0037c6", "#ff7314", "#ff60ff","#86442b","#004d41", "#db
 
 # General required Data:
 wands_df <- read.csv("data/Wandsworth_loans_MRillo.csv", header = TRUE, stringsAsFactors=FALSE)
-morpho_df <- read.csv(file=c("data/all_species_morpho.csv"), header = TRUE, stringsAsFactors = FALSE)
+morpho_buckley_df <- read.csv(file=c("data/morpho_buckley.csv"), header = TRUE, stringsAsFactors = FALSE)
 counts_raw_df <- read.csv("data/counts_raw_R.csv", header = TRUE, stringsAsFactors = FALSE)
 
 # Data for assemblage similarity analysis
@@ -27,7 +27,7 @@ forcens_df <- get_forcens_subset(resamples_df,overwrite=FALSE)
 # creates: data/forcens_coord_dist.csv & data/forcens_subset.csv
  
 # Extracting info of re-sampled sediments
-resamples_df <- suppressWarnings(get_resamples_info(wands_df, morpho_df, overwrite = FALSE)) # creates: data/resample_info.csv & data/resample_info_morpho.csv     
+resamples_df <- suppressWarnings(get_resamples_info(wands_df, morpho_buckley_df, overwrite = FALSE)) # creates: data/resample_info.csv & data/resample_info_morpho.csv     
 plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
 
 
@@ -59,8 +59,12 @@ plot_assemb_similarity(assemb_sim_list, cores10) # creates "output/assemb_simila
 
 ### Data
 resamp_morpho_df <- read.csv("data/resample_info_morpho.csv", header = TRUE, stringsAsFactors=FALSE)
-names(morpho_df)
-resamples <- resamples_df$sample
+names(morpho_buckley_df)
+
+zf_all <- get_buckley_zf(resamples_df) # all slides ZFs numbers from Buckley Collection used in the bias analysis
+get_buckley_morpho(morpho_buckley_df, resamples_df) # creates one CSV for each species for each sample (data/morphometrics/___buckley)
+
+
 
 ssp.names <- c("G.calida","G.conglobatus","G.crassaformis","S.dehiscens","N.dutertrei","G.falconensis",
                "G.glutinata","T.humilis","G.inflata","G.menardii","P.obliquiloculata","N.pachyderma",
@@ -73,9 +77,6 @@ ssp.grep <- c("calida","conglobatus","crassaformis","dehiscens","dutertrei","fal
               "truncatulinoides","tumida", "universa") 
 
 
-
-zf_all <- get_buckley_zf(resamples_df) # all slides ZFs numbers from Buckley Collection used in the bias analysis
-get_buckley_morpho(morpho_df, resamples_df) # creates one CSV for each species for each sample (data/morphometrics/___buckley)
 
   
 ###
