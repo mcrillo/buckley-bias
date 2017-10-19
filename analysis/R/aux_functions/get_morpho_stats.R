@@ -1,0 +1,58 @@
+### Description
+# summary statistics of morpho_bias-analysis.csv
+
+### Arguments
+# morpho_df
+
+get_morpho_stats <- function(morpho_df){
+    if(file.exists("data/morpho_stats.csv")){
+      
+      sumstats <- read.csv("data/morpho_stats.csv", header = TRUE, stringsAsFactors=FALSE)
+      return(sumstats)
+      
+    }else{
+          sumstats <- data.frame(species = character(), sample = integer(), datasetAB = character(), total_ind = integer(), area_max = numeric(), area_log_max = numeric() )
+          
+          for (j in unique(morpho_df$sample)){ # j = resamples[5]
+            data_sample <- morpho_df[which(morpho_df$sample == j),]
+            
+            for (i in unique(data_sample$species)){ # i = unique(data_sample$species)[1]
+              data_species <- data_sample[which(data_sample$species == i),]
+              
+              for (k in unique(data_species$datasetAB)){ # k = unique(data_species$datasetAB)[1]
+                data_final <- data_species[which(data_species$datasetAB == k),]
+                sumstats_temp <- data.frame(species = i,
+                              sspname = unique(data_final$sspname),            
+                              sample = j, 
+                              datasetAB = k,
+                              total_ind = length(data_final[,1]),
+                              
+                              area_min = quantile(data_final$area, probs=0), area_log_min = quantile(data_final$area_log, probs=0),
+                              
+                              area_25q = quantile(data_final$area, probs=0.25), area_log_25q = quantile(data_final$area_log, probs=0.25),
+                              
+                              area_mean = mean(data_final$area), area_log_mean = mean(data_final$area_log),
+                              
+                              area_median = median(data_final$area), area_log_median = median(data_final$area_log),
+                              
+                              area_75q = quantile(data_final$area, probs=0.75), area_log_75q = quantile(data_final$area_log, probs=0.75),
+          
+                              area_95q = quantile(data_final$area, probs=0.95), area_log_95q = quantile(data_final$area_log, probs=0.95),
+                              
+                              area_max = max(data_final$area), area_log_max = max(data_final$area_log)
+                              )
+                sumstats <- rbind(sumstats, sumstats_temp)
+              }
+            }
+          }
+          
+          write.csv(sumstats, file = "data/morpho_stats.csv",row.names=FALSE)
+          return(sumstats)
+      
+    }# else
+}   
+      
+      
+
+
+

@@ -1,67 +1,15 @@
-## Created 22 March 2017
-## Marina Costa Rillo
-## 
-## Reads: all_bias_size.csv ; 
-## Creates: 
-##
+### Description
+# Statistical test
 
-df.bias <- read.csv("Bias_analysis/data_morpho/bias_morpho_individuals.csv", header = TRUE, stringsAsFactors=FALSE)
-names(df.bias)
+### Arguments
+# df.bias
 
 
-############################################### 
-######### Size distributions boxplots ######### 
-####### Buckley vs. Resamples  Datasets #######
-###############################################
+test_morpho_ind <- function(df.bias){}
 
-dwidth <- 0.8 # space between pair-boxplots
+df.bias <- morpho_df
 
-###### Boxplots by SAMPLE
-
-for(i in unique(df.bias$sample)){ # i=25
-
-  df.bias.subset <- df.bias[which(df.bias$sample == i), ]
-  
-  b <- ggplot(df.bias.subset, aes(x=sspname, y=area_log, fill=dataset)) + geom_boxplot(position = position_dodge(width=dwidth))
-  
-  pdf(file = paste("Bias_analysis/plots_morpho/boxplots_by_sample",i, "_sizebx.pdf", sep=""), paper = "a4r", width = 20, height = 8) # default: inches
-  print(b + labs(title = paste("Sample",i,sep=" "), y = "Log(area)", x = element_blank()) +
-    geom_text(data = df.bias.subset, aes(x = sspname, y = area_log_max+0.1, label = total_ind), size = 6, color="red",position = position_dodge(width=dwidth)) +
-    theme(axis.text.y=element_text(size=14), 
-          axis.text.x=element_text(size=11, face="italic", colour="black"), axis.ticks.x=element_blank(),
-          axis.title=element_text(size=14),
-          plot.title = element_text(size = 16, face="bold")) )
-  dev.off()
-  
-}
-
-
-###### Boxplots by SPECIES
-
-for(i in unique(df.bias$species)){ # i = c("menardii")
-  
-  df.bias.subset <- df.bias[which(df.bias$species == i), ]
-  df.bias.subset$sample <- as.character(df.bias.subset$sample)
-  
-  b <- ggplot(df.bias.subset, aes(x=sample, y=area_log, fill=dataset)) + geom_boxplot(position = position_dodge(width=dwidth))
-  
-  pdf(file = paste("Bias_analysis/plots_morpho/boxplots_by_species",i, "_sizebx.pdf", sep=""), paper = "a4r", width = 15, height = 8) # default: inches
-  print(b + labs(title = unique(df.bias.subset$sspname), y = "Log(area)", x = "Sample ID number") +
-    geom_text(data = df.bias.subset, aes(label = total_ind, y = area_log_max+0.1), size = 6, color="red", position = position_dodge(width=dwidth)) +
-    theme(axis.text.y=element_text(size=14), 
-          axis.text.x=element_text(size=14), axis.ticks.x=element_blank(),
-          axis.title=element_text(size=16),
-          plot.title = element_text(size = 18, face="bold.italic")) )
-  dev.off()
-}
-
-
-
-#######################################################################
-##########################  Statistical test ##########################
-#######################################################################
-
-# Two Datasets:
+# One species, two Datasets:
 df.bias.subset <- df.bias[which(df.bias$species == "menardii"), ]
 
 dfA <- df.bias.subset[which(df.bias.subset$datasetAB == "A"), ] # Resample

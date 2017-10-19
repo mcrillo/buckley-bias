@@ -12,11 +12,10 @@ sourceDirectory("./R/aux_functions", modifiedOnly=FALSE)
 # Colours for plots
 cores10 <- c("#00b900","#0037c6", "#ff7314", "#ff60ff","#86442b","#004d41", "#db0011","#00b5ff","#8000b2", "#d0be00")
 
-
 # Extracting info of re-sampled sediments
 morpho_size_distrib <- read.csv(file=c("data/morpho_size-distrib.csv"), header = TRUE, stringsAsFactors = FALSE)
 resamples_df <- suppressWarnings(get_resamples_info(morpho_size_distrib, overwrite = FALSE)) # creates: data/resample_info.csv & data/resample_info_morpho.csv     
-plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
+# plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
 
 
 
@@ -46,7 +45,10 @@ plot_assemb_similarity(assemb_sim_list, cores10) # creates "output/assemb_simila
 ### Size Distribution ###
 #########################
 
+###
 ### Data
+###
+
 if(!file.exists("data/morpho_bias-analysis.csv")){
   resamp_morpho_df <- read.csv("data/resample_info_morpho.csv", header = TRUE, stringsAsFactors=FALSE)
   # zf_all <- get_buckley_zf(resamples_df) # all slides ZFs numbers from Buckley Collection used in the bias analysis
@@ -57,22 +59,27 @@ if(!file.exists("data/morpho_bias-analysis.csv")){
   morpho_df <-read.csv("data/morpho_bias-analysis.csv", header = TRUE, stringsAsFactors=FALSE)
 }
 
+morpho_stats <- get_morpho_stats(morpho_df) # summary statistics for each ssp population of morpho_df
+
+###
+### Analysis & Plots
+###
 
 
+### Individuals
+boxplot_size_species(morpho_df)
+boxplot_size_sample(morpho_df)
 
+test_morpho_ind
+
+
+### Populations
+test_morpho_pop
 
 
 
 
 
   
-###
-### Analysis
-###
 
-
-
-###
-### Plots
-###
 
