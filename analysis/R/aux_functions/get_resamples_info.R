@@ -10,14 +10,14 @@
 # morpho_df	: 
 # overwrite : TRUE or FALSE (if the output file already exist, do you want to re0run the function and overwrite it?)
 
-get_resamples_info <- function(wands_df, morpho_df, overwrite){
+get_resamples_info <- function(morpho_df, overwrite){
 
   if(file.exists("data/resample_info.csv") && overwrite == FALSE){
       sample_table <- read.csv("data/resample_info.csv", header = TRUE)
       return(sample_table)
     
   }else{
-
+      wands_df <- read.csv("data/raw_data/Wandsworth_loans_MRillo.csv", header = TRUE, stringsAsFactors=FALSE)
       # Organizing data
       wands_df$Sample.depth.MIN..cm.<-as.numeric(wands_df$Sample.depth.MIN..cm.) # NAs
       wands_df$Sample.depth.MAX..cm.<-as.numeric(wands_df$Sample.depth.MAX..cm.) # NAs
