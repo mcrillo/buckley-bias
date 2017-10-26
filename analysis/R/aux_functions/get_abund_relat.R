@@ -1,4 +1,12 @@
+### Description
+# 
+# creates: 
 
+### Usage
+# get_abund_relat(forcens_df)
+
+### Arguments
+# forcens_df
 
 
 get_abund_relat <- function(forcens_df){ 
