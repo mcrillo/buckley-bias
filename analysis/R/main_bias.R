@@ -52,14 +52,14 @@ plot_assemb_similarity(assemb_sim_list, cores10) # creates "output/assemb_simila
 if(!file.exists("data/morpho_bias-analysis.csv")){
   resamp_morpho_df <- read.csv("data/resample_info_morpho.csv", header = TRUE, stringsAsFactors=FALSE)
   # zf_all <- get_buckley_zf(resamples_df) # all slides ZFs numbers from Buckley Collection used in the bias analysis
-  get_morpho_buckley(morpho_size_distrib, resamp_morpho_df) # creates data/raw_data_morpho_R
-  get_morpho_bias() # requires CSV files from folder data/raw_data/morpho_bias_buckley
-  morpho_df <- merge_morpho()
+  get_size_data_buckley(morpho_size_distrib, resamp_morpho_df) # creates data/raw_data_morpho_R
+  get_size_data_bias() # requires CSV files from folder data/raw_data/morpho_bias_buckley
+  morpho_df <- merge_size_data()
 }else{
   morpho_df <-read.csv("data/morpho_bias-analysis.csv", header = TRUE, stringsAsFactors=FALSE)
 }
 
-morpho_stats <- get_morpho_stats(morpho_df) # summary statistics for each ssp population of morpho_df
+morpho_stats <- get_size_pop_stats(morpho_df) # summary statistics for each ssp population of morpho_df
 
 ###
 ### Analysis & Plots
@@ -70,11 +70,11 @@ morpho_stats <- get_morpho_stats(morpho_df) # summary statistics for each ssp po
 boxplot_size_species(morpho_df)
 boxplot_size_sample(morpho_df)
 
-test_morpho_ind
+# test_morpho_ind(morpho_df)
 
 
 ### Populations
-test_morpho_pop
+# test_morpho_pop(morpho_stats)
 
 
 

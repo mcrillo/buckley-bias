@@ -1,39 +1,38 @@
-## Created 03 April 2017
-## Marina Costa Rillo
-## 
-## Reads: all_bias_size.csv ; 
-## Creates: 
-##
+### Description
+# Statistical tests of populational size measuremens (95q, mean, max)
+
+### Arguments
+# morpho_stats
 
 
-df.stats <- read.csv("Bias_analysis/data_morpho/bias_morpho_populations.csv", header = TRUE, stringsAsFactors=FALSE)
+morpho_stats <- read.csv("Bias_analysis/data_morpho/bias_morpho_populations.csv", header = TRUE, stringsAsFactors=FALSE)
 
-list.split <- split(df.stats, df.stats$datasetAB) # split accordingly to datasetAB
+list.split <- split(morpho_stats, morpho_stats$datasetAB) # split accordingly to datasetAB
 colnames(list.split$A)[6:19] <- paste(colnames(list.split$A)[6:19],"A", sep = "")
 colnames(list.split$B)[6:19] <- paste(colnames(list.split$B)[6:19],"B", sep = "")
-df.statsAB <- cbind(list.split$A,list.split$B[6:19])
-df.statsAB <- df.statsAB[,-4] # drop duplicate column 'datasetAB'
+morpho_statsAB <- cbind(list.split$A,list.split$B[6:19])
+morpho_statsAB <- morpho_statsAB[,-4] # drop duplicate column 'datasetAB'
 
 
 
 ########################################################
 ######################## STATS #########################
 ########################################################
-names(df.statsAB)
+names(morpho_statsAB)
 
-lmax <- lm(area_log_maxB ~ area_log_maxA, df.statsAB)
+lmax <- lm(area_log_maxB ~ area_log_maxA, morpho_statsAB)
 summary(lmax)
 
-lmedian <- lm(area_log_medianB ~ area_log_medianA, df.statsAB)
+lmedian <- lm(area_log_medianB ~ area_log_medianA, morpho_statsAB)
 summary(lmedian)
 
-lmean <- lm(area_log_meanB ~ area_log_meanA, df.statsAB)
+lmean <- lm(area_log_meanB ~ area_log_meanA, morpho_statsAB)
 summary(lmean)
 
-l75q <- lm(area_log_75qB ~ area_log_75qA, df.statsAB)
+l75q <- lm(area_log_75qB ~ area_log_75qA, morpho_statsAB)
 summary(l75q)
 
-l95q <- lm(area_log_95qB ~ area_log_95qA, df.statsAB)
+l95q <- lm(area_log_95qB ~ area_log_95qA, morpho_statsAB)
 summary(l95q)
 
 # Analysing a bit 
@@ -49,11 +48,11 @@ head(fortify(lmax))
 
 ### Fitting all to the model: intercept = 0, slope = 1
 
-rmax <- df.statsAB$area_log_maxB - df.statsAB$area_log_maxA 
-rmean <- df.statsAB$area_log_meanB - df.statsAB$area_log_meanA 
-rmedian <- df.statsAB$area_log_medianB - df.statsAB$area_log_medianA 
-r95q <- df.statsAB$area_log_95qB - df.statsAB$area_log_95qA 
-r75q <- df.statsAB$area_log_75qB - df.statsAB$area_log_75qA 
+rmax <- morpho_statsAB$area_log_maxB - morpho_statsAB$area_log_maxA 
+rmean <- morpho_statsAB$area_log_meanB - morpho_statsAB$area_log_meanA 
+rmedian <- morpho_statsAB$area_log_medianB - morpho_statsAB$area_log_medianA 
+r95q <- morpho_statsAB$area_log_95qB - morpho_statsAB$area_log_95qA 
+r75q <- morpho_statsAB$area_log_75qB - morpho_statsAB$area_log_75qA 
 
 residuals <- data.frame(rmean, rmedian, r75q, r95q, rmax)
 
@@ -86,13 +85,13 @@ b + labs(y = "Residuals", x = element_blank()) + ylim (-3,3) +
 cores21 <- c("#7c3f27","#7144ca","#c1dd44","#c949bd","#67ce59","#4b2d6b","#ccab3e","#6479c8",
            "#d44430","#78dcc1","#ce3f71","#4d9060","#c588c4","#c3d088","#682b42","#7aa7c2",
            "#cd7f41","#3d4342","#cf7a80","#5f692d","#ccb6a8")
-length(cores21) == length(unique(df.statsAB$species))
+length(cores21) == length(unique(morpho_statsAB$species))
 
 
 ###########
 ### Max ###
 ###########
-bmax <- ggplot(df.statsAB, aes(y = area_log_maxB, x = area_log_maxA) ) 
+bmax <- ggplot(morpho_statsAB, aes(y = area_log_maxB, x = area_log_maxA) ) 
 
 pdf(file = sprintf("Bias_analysis/plots_morpho/max_size.pdf"), width=16, height=10, paper = "special")
 print(
@@ -111,7 +110,7 @@ dev.off()
 ############
 ### Mean ###
 ############
-bmean <- ggplot(df.statsAB, aes(y = area_log_meanB, x = area_log_meanA) ) 
+bmean <- ggplot(morpho_statsAB, aes(y = area_log_meanB, x = area_log_meanA) ) 
 
 pdf(file = sprintf("Bias_analysis/plots_morpho/mean_size.pdf"), width=16, height=10, paper = "special")
 print(
@@ -129,7 +128,7 @@ dev.off()
 ##############
 ### Median ###
 ##############
-bmedian <- ggplot(df.statsAB, aes(y = area_log_medianB, x = area_log_medianA) ) 
+bmedian <- ggplot(morpho_statsAB, aes(y = area_log_medianB, x = area_log_medianA) ) 
 
 pdf(file = sprintf("Bias_analysis/plots_morpho/median_size.pdf"), width=16, height=10, paper = "special")
 print(
@@ -146,7 +145,7 @@ dev.off()
 ############
 ### 95-q ###
 ############
-b95q <- ggplot(df.statsAB, aes(y = area_log_95qB, x = area_log_95qA) ) 
+b95q <- ggplot(morpho_statsAB, aes(y = area_log_95qB, x = area_log_95qA) ) 
 
 pdf(file = sprintf("Bias_analysis/plots_morpho/95q_size.pdf"), width=16, height=10, paper = "special")
 print(
@@ -163,7 +162,7 @@ dev.off()
 ############
 ### 75-q ###
 ############
-b75q <- ggplot(df.statsAB, aes(y = area_log_75qB, x = area_log_75qA) ) 
+b75q <- ggplot(morpho_statsAB, aes(y = area_log_75qB, x = area_log_75qA) ) 
 
 pdf(file = sprintf("Bias_analysis/plots_morpho/75q_size.pdf"), width=16, height=10, paper = "special")
 print(

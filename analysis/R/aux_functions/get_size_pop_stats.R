@@ -4,10 +4,11 @@
 ### Arguments
 # morpho_df
 
-get_morpho_stats <- function(morpho_df){
-    if(file.exists("data/morpho_stats.csv")){
+get_size_pop_stats <- function(morpho_df){
+  
+    if(file.exists("data/morpho_pop_stats.csv")){
       
-      sumstats <- read.csv("data/morpho_stats.csv", header = TRUE, stringsAsFactors=FALSE)
+      sumstats <- read.csv("data/morpho_pop_stats.csv", header = TRUE, stringsAsFactors=FALSE)
       return(sumstats)
       
     }else{
@@ -46,7 +47,7 @@ get_morpho_stats <- function(morpho_df){
             }
           }
           
-          write.csv(sumstats, file = "data/morpho_stats.csv",row.names=FALSE)
+          write.csv(sumstats, file = "data/morpho_pop_stats.csv",row.names=FALSE)
           return(sumstats)
       
     }# else

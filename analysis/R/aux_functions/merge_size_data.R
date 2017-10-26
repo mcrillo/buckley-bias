@@ -4,7 +4,7 @@
 ### Arguments
 # none, but requires files in folder "morpho_R"
 
-merge_morpho <- function(){
+merge_size_data <- function(){
 
   all.bias.size <- data.frame(area=double(), diam.max=double(), area_max=double(),  area_log=double(), area_log_max=double(), total_ind=integer(),
                                 species=character(), sspname=character(), sample=integer(), dataset=character(), datasetAB=character())

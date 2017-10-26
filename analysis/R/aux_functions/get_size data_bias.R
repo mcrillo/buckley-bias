@@ -4,7 +4,7 @@
 ### Arguments
 # none, but requires files in folder morpho_bias_buckley
 
-get_morpho_bias <- function(){
+get_size_data_bias <- function(){
   
   files.names <- list.files(path = "data/raw_data/morpho_bias_buckley/", pattern="*.csv")
   check.col2 <- c()

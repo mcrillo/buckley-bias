@@ -5,7 +5,7 @@
 # morpho_df
 # resamples_df
 
-get_morpho_buckley <- function(morpho_df, resamples_df){
+get_size_data_buckley <- function(morpho_df, resamples_df){
   if (!file.exists("data/raw_data/morpho_R")){
     dir.create("data/raw_data/morpho_R")
   }
