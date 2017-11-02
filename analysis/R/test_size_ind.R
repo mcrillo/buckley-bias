@@ -7,29 +7,30 @@
 
 test_morpho_ind <- function(morpho_df){}
       
-      i <- unique(morpho_df$species)[10]
-
+      # for( i in unique(morpho_df$species) ) # i <- unique(morpho_df$species)[10]
+      
+      # One species, two Datasets:
+      morpho_df_subset <- morpho_df[which(morpho_df$species == i), ]
+      
+      ggplot(morpho_df_subset,aes(x=area_log, fill = dataset)) + 
+        geom_histogram(binwidth = 0.1, alpha=0.5, position="identity") +
+        scale_fill_manual(values = c("red","blue")) +
+        labs(x="Log(area)",y="Number of individuals", title=unique(morpho_df_subset$sspname)) +
+        theme(plot.title = element_text(face = "bold.italic", size = 14),
+              legend.position = c(11,20))
       
       ### Checking normality of the data - Shapiro Wilk normality test
       # H0: sample x came from a normally distributed population
       # p-value < 0.05 : reject H0 -> x not normally distributed
+      
+      dfA <- morpho_df_subset[which(morpho_df_subset$datasetAB == "A"), ] # Resample
+      dfB <- morpho_df_subset[which(morpho_df_subset$datasetAB == "B"), ] # Buckley
       
       # with(dfA, tapply(area_log, species, shapiro.test))
       shap <- shapiro.test(dfA$area_log)
       shapiro.test(dfA$area)
       shapiro.test(dfB$area_log)
       shapiro.test(dfB$area)
-      
-      
-      
-      # One species, two Datasets:
-      morpho_df_subset <- morpho_df[which(morpho_df$species == i), ]
-      
-      dfA <- morpho_df_subset[which(morpho_df_subset$datasetAB == "A"), ] # Resample
-      dfB <- morpho_df_subset[which(morpho_df_subset$datasetAB == "B"), ] # Buckley
-      
-      ggplot(dfA, aes(x=area_log)) + geom_histogram(binwidth=0.05) + 
-        labs(x="Log(area)",y="No. individuals", title="Size Distribution")
       
       ###### All samples together
       kstest <- ks.test(x=dfA$area_log, y=dfB$area_log, alternative = c("two.sided"),exact = NULL)
@@ -97,5 +98,5 @@ test_morpho_ind <- function(morpho_df){}
       capture.output(kstest,file=paste("output/size_kstest_indiv/",i, ".txt", sep=""))
       
       
-     
-      
+      # two-sample Kolmogorov-Smirnov : assuming sample values come from continuous distributions, test whether the population distributions are different (but failure to reject doesn't mean they're actually the same).
+      # The null distribution of this statistic is calculated under the null hypothesis that the samples are drawn from the same distribution (in the two-sample case)
