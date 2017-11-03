@@ -26,8 +26,8 @@ resamples_df <- suppressWarnings(get_resamples_info(morpho_size_distrib, overwri
 ### Data
 forcens_df <- get_forcens_subset(resamples_df,overwrite=FALSE) 
 # Merging species counts (assemblages) from (A) re-samples , (B) Buckley collection and (C) ForCenS data:
-assemb_counts_df <- get_abund_counts(forcens_df) # creates "data/counts_merged.csv"
-assemb_relat_df <- get_abund_relat(forcens_df) # creates "data/counts_merged_relat.csv"
+assemb_counts_df <- get_abund_counts(forcens_df, overwrite = FALSE) # creates "data/counts_merged.csv"
+assemb_relat_df <- get_abund_relat(forcens_df, overwrite = FALSE) # creates "data/counts_merged_relat.csv"
 
 ### Analysis
 # Calculating similarity index (based on Chao) for assemblages of Re-sampling X Buckley Collection X ForCenS
@@ -65,21 +65,19 @@ morpho_stats <- get_size_pop_stats(morpho_df) # summary statistics for each ssp 
 ### Analysis & Plots
 ###
 
-
 ### Individuals
 boxplot_size_species(morpho_df)
 boxplot_size_sample(morpho_df)
 
-
-
-
-# test_morpho_ind(morpho_df)
+# test_size_ind(morpho_df)
 
 
 ### Populations
-# test_morpho_pop(morpho_stats)
 
+# test_size_pop(morpho_stats)
 
+### size-distrib-forams project: just size bias analysis and for fewer species
+get_bias_size-distrib_project(morpho_df,morpho_stats) 
 
 
 

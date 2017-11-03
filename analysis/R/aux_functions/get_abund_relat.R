@@ -9,7 +9,7 @@
 # forcens_df
 
 
-get_abund_relat <- function(forcens_df){ 
+get_abund_relat <- function(forcens_df, overwrite){ 
   
   if(file.exists("data/counts_relative.csv") && overwrite == FALSE){
     

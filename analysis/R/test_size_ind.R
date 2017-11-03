@@ -98,5 +98,3 @@ test_morpho_ind <- function(morpho_df){}
       capture.output(kstest,file=paste("output/size_kstest_indiv/",i, ".txt", sep=""))
       
       
-      # two-sample Kolmogorov-Smirnov : assuming sample values come from continuous distributions, test whether the population distributions are different (but failure to reject doesn't mean they're actually the same).
-      # The null distribution of this statistic is calculated under the null hypothesis that the samples are drawn from the same distribution (in the two-sample case)

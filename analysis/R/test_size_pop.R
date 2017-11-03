@@ -20,9 +20,6 @@ morpho_statsAB <- morpho_statsAB[,-4] # drop duplicate column 'datasetAB'
 ########################################################
 names(morpho_statsAB)
 
-lmax <- lm(area_log_maxB ~ area_log_maxA, morpho_statsAB)
-summary(lmax)
-
 lmedian <- lm(area_log_medianB ~ area_log_medianA, morpho_statsAB)
 summary(lmedian)
 
@@ -34,6 +31,9 @@ summary(l75q)
 
 l95q <- lm(area_log_95qB ~ area_log_95qA, morpho_statsAB)
 summary(l95q)
+
+lmax <- lm(area_log_maxB ~ area_log_maxA, morpho_statsAB)
+summary(lmax)
 
 # Analysing a bit 
 lmax$coefficients
