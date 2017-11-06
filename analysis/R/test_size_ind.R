@@ -7,17 +7,24 @@
 
 test_morpho_ind <- function(morpho_df){}
       
-      # for( i in unique(morpho_df$species) ) # i <- unique(morpho_df$species)[10]
-      
-      # One species, two Datasets:
-      morpho_df_subset <- morpho_df[which(morpho_df$species == i), ]
-      
-      ggplot(morpho_df_subset,aes(x=area_log, fill = dataset)) + 
-        geom_histogram(binwidth = 0.1, alpha=0.5, position="identity") +
-        scale_fill_manual(values = c("red","blue")) +
-        labs(x="Log(area)",y="Number of individuals", title=unique(morpho_df_subset$sspname)) +
-        theme(plot.title = element_text(face = "bold.italic", size = 14),
-              legend.position = c(11,20))
+      if (!file.exists("output/size_histograms")){
+  
+        dir.create("output/size_histograms")
+        
+        for( i in unique(morpho_df$species) ){ # i <- unique(morpho_df$species)[10]
+          # One species, two Datasets:
+          morpho_df_subset <- morpho_df[which(morpho_df$species == i), ]
+          p <-  ggplot(morpho_df_subset,aes(x=area_log, fill = dataset)) + 
+                        geom_histogram(binwidth = 0.1, alpha=0.5, position="identity") +
+                        scale_fill_manual(values = c("red","blue")) +
+                        labs(x="Log(area)",y="Number of individuals", title=unique(morpho_df_subset$sspname)) +
+                        theme(plot.title = element_text(face = "bold.italic", size = 14))
+          
+          pdf(file = paste("output/size_histograms/", i, ".pdf", sep = ""), width=12, height=6, paper = "special")
+            print(p)
+          dev.off()
+        } # for species
+      } # if
       
       ### Checking normality of the data - Shapiro Wilk normality test
       # H0: sample x came from a normally distributed population

@@ -1,7 +1,0 @@
-
-	Two-sample Kolmogorov-Smirnov test
-
-data:  dfA$area_log and dfB$area_log
-D = 0.41597, p-value = 4.406e-09
-alternative hypothesis: two-sided
-
