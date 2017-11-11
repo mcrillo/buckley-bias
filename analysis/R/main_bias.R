@@ -68,16 +68,18 @@ morpho_stats <- get_size_pop_stats(morpho_df) # summary statistics for each ssp 
 ### Individuals
 boxplot_size_species(morpho_df)
 boxplot_size_sample(morpho_df)
-
 # test_size_ind(morpho_df)
 
 
 ### Populations
-
 # test_size_pop(morpho_stats)
 
-### size-distrib-forams project: just size bias analysis and for fewer species
-get_bias_size-distrib_project(morpho_df,morpho_stats) 
+
+###
+### Project size-distrib-forams
+###
+species_names <- species_names[-which(species_names == "dehiscens")] # S. dehiscens has too few samples
+get_bias_size-distrib_project(morpho_df,morpho_stats,species_names) 
 
 
 

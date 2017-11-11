@@ -2,15 +2,11 @@
 # Size bias analysis for size-distrib-forams project
 
 ### Arguments
-# morpho_df
+# morpho_df: morphometric data individual level
+# morpfo_stats: morphometric data populational level (min, mean, median, 95q, max)
+# species_names
 
-
-get_bias_size-distrib_project <- function(morpho_df,morpho_stats){}
-    
-    source("R/aux_functions/species_names.R")
-
-    # excludign dehiscens: too few samples
-    species_names <- species_names[-which(species_names == "dehiscens")]
+get_bias_size-distrib_project <- function(morpho_df,morpho_stats,species_names){}
     
     # subseting data for size-distrib-forams species
     data <- morpho_df[which(morpho_df$species %in% species_names), ]
