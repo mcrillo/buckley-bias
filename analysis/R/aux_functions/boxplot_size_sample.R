@@ -3,14 +3,16 @@
 # ONLY PLOTS if folder "size_boxplot_sample" DOES NOT exists
 
 ### Arguments
-# morpho_df
+# size_ind_df: bias_size_analysis.csv (individual measurements)
+# overwrite : TRUE or FALSE (if the output file already exist, do you want to re-run the function and overwrite it?)
 
 
-boxplot_size_sample <-function(data){
+boxplot_size_sample <-function(data, overwrite){
   
-      if (!file.exists("output/size_boxplot_sample")){
+      if (!file.exists("output/size_boxplot_sample") | overwrite == TRUE){
         
-            dir.create("output/size_boxplot_sample")
+        if (!file.exists("output/size_boxplot_sample"){
+            dir.create("output/size_boxplot_sample") }
         
             dwidth <- 0.8 # space between pair-boxplots
         

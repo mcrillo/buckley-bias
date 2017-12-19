@@ -12,9 +12,12 @@ sourceDirectory("./R/aux_functions", modifiedOnly=FALSE)
 # Colours for plots
 cores10 <- c("#00b900","#0037c6", "#ff7314", "#ff60ff","#86442b","#004d41", "#db0011","#00b5ff","#8000b2", "#d0be00")
 
-# Extracting info of re-sampled sediments
-morpho_size_distrib <- read.csv(file=c("data/morpho_size-distrib.csv"), header = TRUE, stringsAsFactors = FALSE)
-resamples_df <- suppressWarnings(get_resamples_info(morpho_size_distrib, overwrite = FALSE)) # creates: data/resample_info.csv & data/resample_info_morpho.csv     
+# General data
+buckley_measurmts <- read.csv(file=c("data/buckley_measurmts.csv"), header = TRUE, stringsAsFactors = FALSE)
+wands_df <- read.csv("data/Wandsworth_loans_MRillo.csv", header = TRUE, stringsAsFactors=FALSE)
+resamples_df <- suppressWarnings(get_resamples_info(buckley_measurmts, wands_df, overwrite = T)) # creates: data/resample_info.csv & data/resample_info_morpho.csv     
+resamp_size_df <- read.csv("data/resample_info_size.csv", header = TRUE, stringsAsFactors=FALSE)
+
 # plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
 
 
@@ -23,7 +26,7 @@ resamples_df <- suppressWarnings(get_resamples_info(morpho_size_distrib, overwri
 ### Assemblage Composition ###
 ##############################
 
-### Data
+### Data Holocene
 forcens_df <- get_forcens_subset(resamples_df,overwrite=FALSE) 
 # Merging species counts (assemblages) from (A) re-samples , (B) Buckley collection and (C) ForCenS data:
 assemb_counts_df <- get_abund_counts(forcens_df, overwrite = FALSE) # creates "data/counts_merged.csv"
@@ -45,33 +48,22 @@ plot_assemb_similarity(assemb_sim_list, cores10) # creates "output/assemb_simila
 ### Size Distribution ###
 #########################
 
-###
 ### Data
-###
+# Creates files in data/bias_size_analysis
+get_size_data(buckley_measurmts, resamp_size_df, overwrite = FALSE) 
+# Merges csv files from bias_size_analysis into one data.frame: bias_size_analysis.csv
+size_ind_df <- merge_size_data(overwrite = FALSE)
+size_pop_df <- get_size_pop_data(size_ind_df, overwrite = FALSE) # summary statistics for each ssp population of size_ind_df
 
-if(!file.exists("data/morpho_bias-analysis.csv")){
-  resamp_morpho_df <- read.csv("data/resample_info_morpho.csv", header = TRUE, stringsAsFactors=FALSE)
-  # zf_all <- get_buckley_zf(resamples_df) # all slides ZFs numbers from Buckley Collection used in the bias analysis
-  get_size_data_buckley(morpho_size_distrib, resamp_morpho_df) # creates data/raw_data_morpho_R
-  get_size_data_bias() # requires CSV files from folder data/raw_data/morpho_bias_buckley
-  morpho_df <- merge_size_data()
-}else{
-  morpho_df <-read.csv("data/morpho_bias-analysis.csv", header = TRUE, stringsAsFactors=FALSE)
-}
 
-morpho_stats <- get_size_pop_stats(morpho_df) # summary statistics for each ssp population of morpho_df
-
-###
 ### Analysis & Plots
-###
 
-### Individuals
-boxplot_size_species(morpho_df)
-boxplot_size_sample(morpho_df)
-# test_size_ind(morpho_df)
+# Individuals
+boxplot_size_species(size_ind_df, overwrite = FALSE)
+boxplot_size_sample(size_ind_df, overwrite = FALSE)
+# test_size_ind(size_ind_df)
 
-
-### Populations
+# Populations
 # test_size_pop(morpho_stats)
 
 
@@ -79,7 +71,7 @@ boxplot_size_sample(morpho_df)
 ### Project size-distrib-forams
 ###
 species_names <- species_names[-which(species_names == "dehiscens")] # S. dehiscens has too few samples
-get_bias_size-distrib_project(morpho_df,morpho_stats,species_names) 
+get_bias_size-distrib_project(size_ind_df,morpho_stats,species_names) 
 
 
 
