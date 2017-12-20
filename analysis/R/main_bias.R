@@ -18,7 +18,7 @@ wands_df <- read.csv("data/Wandsworth_loans_MRillo.csv", header = TRUE, stringsA
 resamples_df <- suppressWarnings(get_resamples_info(buckley_measurmts, wands_df, overwrite = T)) # creates: data/resample_info.csv & data/resample_info_morpho.csv     
 resamp_size_df <- read.csv("data/resample_info_size.csv", header = TRUE, stringsAsFactors=FALSE)
 
-# plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
+plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
 
 
 
@@ -38,7 +38,7 @@ assemb_sim_list <- get_assemb_similarity(assemb_counts_df, resamples_df$sample, 
 
 ### Plots
 # Histograms of species relative abundances for each datasets (Bias, Buckley, ForCenS), per sample
-suppressWarnings(plot_abund_histograms(assemb_relat_df, resamples_df)) # creates "output/abund_histograms"
+suppressWarnings(plot_abund_histograms(assemb_relat_df, resamples_df, overwrite = FALSE)) # creates "output/abund_histograms"
 # Chao similarity index plot
 plot_assemb_similarity(assemb_sim_list, cores10) # creates "output/assemb_similarity"
 
@@ -50,17 +50,17 @@ plot_assemb_similarity(assemb_sim_list, cores10) # creates "output/assemb_simila
 
 ### Data
 # Creates files in data/bias_size_analysis
-get_size_data(buckley_measurmts, resamp_size_df, overwrite = FALSE) 
+get_size_data(buckley_measurmts, resamp_size_df, overwrite = F) 
 # Merges csv files from bias_size_analysis into one data.frame: bias_size_analysis.csv
-size_ind_df <- merge_size_data(overwrite = FALSE)
-size_pop_df <- get_size_pop_data(size_ind_df, overwrite = FALSE) # summary statistics for each ssp population of size_ind_df
+size_ind_df <- merge_size_data(overwrite = F)
+size_pop_df <- get_size_pop_data(size_ind_df, overwrite = F) # summary statistics for each ssp population of size_ind_df
 
 
 ### Analysis & Plots
 
 # Individuals
-boxplot_size_species(size_ind_df, overwrite = FALSE)
-boxplot_size_sample(size_ind_df, overwrite = FALSE)
+boxplot_size_species(size_ind_df, overwrite = F)
+boxplot_size_sample(size_ind_df, overwrite = F)
 # test_size_ind(size_ind_df)
 
 # Populations

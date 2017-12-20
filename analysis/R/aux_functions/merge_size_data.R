@@ -6,8 +6,12 @@
 
 merge_size_data <- function(overwrite){
 
-
-  if(!file.exists("data/bias_size_analysis.csv") | overwrite == TRUE){
+  if(file.exists("data/bias_size_analysis.csv") && overwrite == FALSE){
+    
+    all.bias.size <-read.csv("data/bias_size_analysis.csv", header = TRUE, stringsAsFactors=FALSE)
+    return(all.bias.size)
+    
+  }else{  
       
       all.bias.size <- data.frame(area=double(), diam.max=double(), area_max=double(),  area_log=double(), area_log_max=double(), total_ind=integer(),
                                     species=character(), sspname=character(), sample=integer(), dataset=character(), datasetAB=character())
@@ -24,13 +28,63 @@ merge_size_data <- function(overwrite){
                     "ruber","rubescens","sacculifer","scitula","siphonifera","tenellus",
                     "truncatulinoides","tumida", "universa") 
       
-      # removing files of species that were present only in one dataset (A or B)
-      remove <- c("dehiscens20B.csv","dehiscens25B.csv","dehiscens31B.csv","dehiscens46B.csv","elongatus20A.csv",       
-                  "elongatus25A.csv","elongatus27A.csv","elongatus31A.csv","elongatus46A.csv","menardii25B.csv",        
-                  "menardii31B.csv","obliquiloculata31B.csv","pachyderma27B.csv","pachyderma44B.csv","truncatulinoides31B.csv")
-    
+      # merging elongatus into ruber (Buckley did not differentiate between them)
       
-      for (i in 1:2){ # i = 2
+      data_elong18 <- read.csv("data/bias_size_analysis/elongatus18A.csv", header = TRUE, stringsAsFactors=FALSE)
+      data_ruber18 <- read.csv("data/bias_size_analysis/ruber18A.csv", header = TRUE, stringsAsFactors=FALSE)
+      # making sure I do not add elongatus twice to ruber dataset:
+      ruber18_original_length <- 41
+      elong18_original_length <- 29
+      data_ruber18 <- rbind(data_ruber18, data_elong18)
+      if(length(data_ruber18[,1]) == (ruber18_original_length + elong18_original_length)){ 
+        # TRUE if it is first time elongatus is added to ruber, FALSE if it has already been added
+        write.csv(data_ruber18, "data/bias_size_analysis/ruber18A.csv",row.names=FALSE) }
+      
+      # same thing as for sample 18
+      data_elong23 <- read.csv("data/bias_size_analysis/elongatus23A.csv", header = TRUE, stringsAsFactors=FALSE)
+      data_ruber23 <- read.csv("data/bias_size_analysis/ruber23A.csv", header = TRUE, stringsAsFactors=FALSE)
+      ruber23_original_length <- 62
+      elong23_original_length <- 32
+      data_ruber23 <- rbind(data_ruber23, data_elong23)
+      if(length(data_ruber23[,1])== (ruber23_original_length + elong23_original_length) ){ 
+        write.csv(data_ruber23, "data/bias_size_analysis/ruber23A.csv",row.names=FALSE) }
+      
+      
+      data_elong25 <- read.csv("data/bias_size_analysis/elongatus25A.csv", header = TRUE, stringsAsFactors=FALSE)
+      data_ruber25 <- read.csv("data/bias_size_analysis/ruber25A.csv", header = TRUE, stringsAsFactors=FALSE)
+      ruber25_original_length <- 96
+      elong25_original_length <- 98
+      data_ruber25 <- rbind(data_ruber25, data_elong25)
+      if(length(data_ruber25[,1]) == (ruber25_original_length + elong25_original_length)){ 
+        write.csv(data_ruber25, "data/bias_size_analysis/ruber25A.csv",row.names=FALSE)}
+      
+      data_elong29 <- read.csv("data/bias_size_analysis/elongatus29A.csv", header = TRUE, stringsAsFactors=FALSE)
+      data_ruber29 <- read.csv("data/bias_size_analysis/ruber29A.csv", header = TRUE, stringsAsFactors=FALSE)
+      ruber29_original_length <- 87
+      elong29_original_length <- 36
+      data_ruber29 <- rbind(data_ruber29, data_elong29)
+      if(length(data_ruber29[,1]) == (ruber29_original_length + elong29_original_length)){ 
+        write.csv(data_ruber29, "data/bias_size_analysis/ruber29A.csv",row.names=FALSE)}
+      
+      data_elong44 <- read.csv("data/bias_size_analysis/elongatus44A.csv", header = TRUE, stringsAsFactors=FALSE)
+      data_ruber44 <- read.csv("data/bias_size_analysis/ruber44A.csv", header = TRUE, stringsAsFactors=FALSE)
+      ruber44_original_length <- 87
+      elong44_original_length <- 24
+      data_ruber44 <- rbind(data_ruber44, data_elong44)
+      if(length(data_ruber44[,1]) == (ruber44_original_length + elong44_original_length)){ 
+        write.csv(data_ruber44, "data/bias_size_analysis/ruber44A.csv",row.names=FALSE)}
+      
+      
+      # removing files of species that were present only in one dataset (A or B)
+      # OBS1: new sample number (see README file in raw_data_measurmts folder)
+      remove <- c("dehiscens25A.csv","dehiscens42A.csv", "siphonifera23B.csv",
+                  "menardii23B.csv","menardii29B.csv","obliquiloculata29B.csv",
+                  "pachyderma25B.csv","pachyderma42B.csv","truncatulinoides29B.csv",
+                  "elongatus18A.csv","elongatus23A.csv","elongatus25A.csv","elongatus29A.csv","elongatus44A.csv")
+
+      
+      
+      for (i in 1:2){ # for each dataset (A or B) # i = 2
         
         files.names <- list.files(path = "data/bias_size_analysis/", pattern=paste(s[i],".csv", sep=""))
         files.names <- files.names[-which(files.names %in% remove)]
@@ -62,11 +116,8 @@ merge_size_data <- function(overwrite){
       write.csv(all.bias.size, file = "data/bias_size_analysis.csv",row.names=FALSE)  
       return(all.bias.size)
       
-  }else{ # if (overwrite)   
-    all.bias.size <-read.csv("data/bias_size_analysis.csv", header = TRUE, stringsAsFactors=FALSE)
-    return(all.bias.size)
-  }  
-  
+  } # if (overwrite)   
+
 }
   
   

@@ -1,18 +1,19 @@
 ### Description
 # Histograms (per sample) of relative abundances of 3 datasets (Boas, Buckley, ForCenS)
-# ONLY PLOTS if folder "abund_histograms" DOES NOT exists
 
 
 ### Arguments
 # assemb_relat_df
 # resamples_df
+# overwrite : TRUE or FALSE (if the output file already exist, do you want to re-run the function and overwrite it?)
 
 
-plot_abund_histograms <- function(assemb_relat_df,resamples_df){
+plot_abund_histograms <- function(assemb_relat_df, resamples_df, overwrite){
 
-      if (!file.exists("output/abund_histograms")){
-        
-          dir.create("output/abund_histograms")
+      if (!file.exists("output/abund_histograms") | overwrite == TRUE){
+          
+          if (!file.exists("output/abund_histograms")){
+            dir.create("output/abund_histograms")}
 
           for (i in resamples_df$sample){ # i=25
               # Subsetting for sample i

@@ -6,10 +6,10 @@
 
 ### Arguments
 # buckley_measurmts: morphometric dataset from size-distrib-forams project (morpho_all_ssp.csv)
-# resamp_morpho_df: re-samples information creates by fucntion get_resamples_info.R
+# resamp_size_df: re-samples information creates by fucntion get_resamples_info.R
 # overwrite : TRUE or FALSE (if the output file already exist, do you want to re-run the function and overwrite it?)
 
-get_size_data <- function(buckley_measurmts, resamp_morpho_df, overwrite){
+get_size_data <- function(buckley_measurmts, resamp_size_df, overwrite){
   
   if(!file.exists("data/bias_size_analysis/") | overwrite == TRUE){
     
@@ -19,7 +19,7 @@ get_size_data <- function(buckley_measurmts, resamp_morpho_df, overwrite){
     
     ### Getting size data from Buckley Collection
     
-    for (j in unique(resamp_morpho_df$sample)){ # j = resamp_morpho_df$sample[3]
+    for (j in unique(resamp_size_df$sample)){ # j = resamp_size_df$sample[3]
       for (i in unique(buckley_measurmts$species)){ # i = unique(buckley_measurmts$species)[11]
         rows <- intersect(which(buckley_measurmts["sample"]==j), which(buckley_measurmts["species"]==i))
         if (length(rows) != 0){

@@ -4,14 +4,14 @@
 # creates: data/resample_info.csv & data/resample_info_morpho.csv     
 
 ### Usage
-# resamples_df <- get_resamples_info(buckley_morpho, overwrite = TRUE)
+# resamples_df <- get_resamples_info(buckley_measurmts, overwrite = TRUE)
 
 ### Arguments
-# buckley_morpho: morphometric dataset from size-distrib-forams project (morpho_all_ssp.csv)
+# buckley_measurmts: morphometric dataset from size-distrib-forams project (morpho_all_ssp.csv)
 # wands_df: spreadsheet with all loans from Wandsworth taken by me Wandsworth_loans_MRillo.csv
 # overwrite: TRUE or FALSE (if the output file already exist, do you want to re0run the function and overwrite it?)
 
-get_resamples_info <- function(buckley_morpho, wands_df, overwrite){
+get_resamples_info <- function(buckley_measurmts, wands_df, overwrite){
 
   if(file.exists("data/resample_info.csv") && file.exists("data/resample_info_size.csv") && overwrite == FALSE){
       sample_table <- read.csv("data/resample_info.csv", header = TRUE)
@@ -24,14 +24,13 @@ get_resamples_info <- function(buckley_morpho, wands_df, overwrite){
       wands_df <- wands_df[-which(wands_df[,"Sample..g..approx."]==0),] # deleting sediments that I did/could not sample
       # length(wands_df[,1]) # number of samples taken
       
-      irn_morpho <- sort(unique(buckley_morpho[,"IRN_Residue_OBD"]))
-      # length(irn_morpho) # samples that I used for the morphometric
+      irn_morpho <- sort(unique(buckley_measurmts[,"IRN_Residue_OBD"]))
       intersect_samples <- intersect(wands_df[,"Residue.IRN"],irn_morpho) # samples used for morphometric AND re-sampled in Wandsworth
       # length(intersect_samples) # samples that I re-sampled and used for morphometrics
       
       # Getting list of sampled sediments AND used for morphometrics
-      morpho_sampled <- buckley_morpho[which(buckley_morpho[,"IRN_Residue_OBD"] %in% intersect_samples),]
-      # morpho_not_sampled <- buckley_morpho[which(buckley_morpho[,"Residue.OBD.IRN"] %!in% intersect_samples),]
+      morpho_sampled <- buckley_measurmts[which(buckley_measurmts[,"IRN_Residue_OBD"] %in% intersect_samples),]
+      # morpho_not_sampled <- buckley_measurmts[which(buckley_measurmts[,"Residue.OBD.IRN"] %!in% intersect_samples),]
       wands_sampled <- wands_df[which(wands_df[,"Residue.IRN"] %in% intersect_samples),]
       
       # Checking if they match
@@ -59,11 +58,14 @@ get_resamples_info <- function(buckley_morpho, wands_df, overwrite){
       names(sample_ssp_table) <- c("ZF.PF.no.","sample","total_ssp_morpho","species","total_ind_Buckley","Lat", "Long","Vessel","Date","Museum_no","OBD_IRN", "Sea Depth", "cm_MIN", "cm_MAX")
       
       
-      # Samples that I chose to pick:
-      chosen <- c(5,10,20,25,27,31,44,46,55,66)
+      # Samples that I chose to pick (IRN number):
+      chosen <- c(32657,38482,36053,34991,34671,34993,37148,33668,33286,14609)
       
-      sample_table <- sample_table[which(sample_table[,"sample"] %in% chosen),]
-      sample_ssp_table <- sample_ssp_table[which(sample_ssp_table[,"sample"] %in% chosen),]
+      sample_table <- sample_table[which(sample_table[,"OBD_IRN"] %in% chosen),]
+      sample_ssp_table <- sample_ssp_table[which(sample_ssp_table[,"OBD_IRN"] %in% chosen),]
+      
+      # samples_old <- c(5,10,20,25,27,31,44,46,55,66)
+      # samples_new <- c(5, 9,18,23,25,29,42,44,53,64)
       
       write.csv(sample_table, file = "data/resample_info.csv",row.names=FALSE)
       write.csv(sample_ssp_table, file = "data/resample_info_size.csv",row.names=FALSE)
