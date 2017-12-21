@@ -12,12 +12,8 @@
 plot_map_resamples <- function(resamples_df, overwrite){
   
       # Plotting map with morphometric samples and re-sampled ones (with sample number)
+      if (!file.exists("output/resamples_map.pdf") | overwrite == TRUE){
 
-      if(file.exists("output/resamples_map.pdf") && overwrite == FALSE){
-        
-        return()
-        
-      }else{
             # Maptools dataset
             data(wrld_simpl)
             world <- fortify(wrld_simpl)
@@ -36,7 +32,7 @@ plot_map_resamples <- function(resamples_df, overwrite){
                 print(mapplot)
             dev.off()
               
-        } # else
+        } # if
       
 }
 

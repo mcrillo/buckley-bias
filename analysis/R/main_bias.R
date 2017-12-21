@@ -9,9 +9,6 @@ source("R/library.R")
 # Auxiliary functions
 sourceDirectory("./R/aux_functions", modifiedOnly=FALSE)
 
-# Colours for plots
-cores10 <- c("#00b900","#0037c6", "#ff7314", "#ff60ff","#86442b","#004d41", "#db0011","#00b5ff","#8000b2", "#d0be00")
-
 # General data
 buckley_measurmts <- read.csv(file=c("data/buckley_measurmts.csv"), header = TRUE, stringsAsFactors = FALSE)
 wands_df <- read.csv("data/Wandsworth_loans_MRillo.csv", header = TRUE, stringsAsFactors=FALSE)
@@ -25,6 +22,9 @@ plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_
 ##############################
 ### Assemblage Composition ###
 ##############################
+
+# Colours for plots
+cores10 <- c("#00b900","#0037c6", "#ff7314", "#ff60ff","#86442b","#004d41", "#db0011","#00b5ff","#8000b2", "#d0be00")
 
 ### Data Holocene
 forcens_df <- get_forcens_subset(resamples_df,overwrite=FALSE) 
@@ -55,26 +55,21 @@ get_size_data(buckley_measurmts, resamp_size_df, overwrite = F)
 size_ind_df <- merge_size_data(overwrite = F)
 size_pop_df <- get_size_pop_data(size_ind_df, overwrite = F) # summary statistics for each ssp population of size_ind_df
 
-
 ### Analysis & Plots
 
 # Individuals
 boxplot_size_species(size_ind_df, overwrite = F)
 boxplot_size_sample(size_ind_df, overwrite = F)
+plot_size_histograms(size_ind_df, overwrite = F)
 # test_size_ind(size_ind_df)
 
 # Populations
-# test_size_pop(morpho_stats)
+resid_list <- get_size_pop_residuals(size_pop_df, file_name = "size_pop_residuals_allssp", overwrite = T)
 
-
-###
-### Project size-distrib-forams
-###
-species_names <- species_names[-which(species_names == "dehiscens")] # S. dehiscens has too few samples
-get_bias_size-distrib_project(size_ind_df,morpho_stats,species_names) 
-
-
-
-  
+transf<- "log" # "sqrt"
+resid_list$stats[which.min(resid_list$stats[,paste("rss_",transf,sep="")]),"rownames"]
+res <- melt(as.data.frame(resid_list[[transf]])) # warning ok 
+plot_resid_histogram(res, transf, overwrite = F)
+plot_resid_violin(res, transf, overwrite = F) 
 
 

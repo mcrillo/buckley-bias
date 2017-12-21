@@ -6,9 +6,9 @@
 
 merge_size_data <- function(overwrite){
 
-  if(file.exists("data/bias_size_analysis.csv") && overwrite == FALSE){
+  if(file.exists("data/bias_size_ind.csv") && overwrite == FALSE){
     
-    all.bias.size <-read.csv("data/bias_size_analysis.csv", header = TRUE, stringsAsFactors=FALSE)
+    all.bias.size <-read.csv("data/bias_size_ind.csv", header = TRUE, stringsAsFactors=FALSE)
     return(all.bias.size)
     
   }else{  
@@ -113,7 +113,7 @@ merge_size_data <- function(overwrite){
         }
       }
       
-      write.csv(all.bias.size, file = "data/bias_size_analysis.csv",row.names=FALSE)  
+      write.csv(all.bias.size, file = "data/bias_size_ind.csv",row.names=FALSE)  
       return(all.bias.size)
       
   } # if (overwrite)   

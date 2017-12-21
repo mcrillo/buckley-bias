@@ -56,7 +56,7 @@ get_size_pop_data <- function(size_ind_df, overwrite){
                               
                               area_max = max(data_final$area), 
                               area_log_max = max(data_final$area_log),
-                              area_log_max = max(data_final$area_sqrt)
+                              area_sqrt_max = max(data_final$area_sqrt)
                               
                               )
                 sumstats <- rbind(sumstats, sumstats_temp)

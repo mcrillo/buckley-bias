@@ -2,36 +2,38 @@
 # Statistical tests of individual size measuremens 
 
 ### Arguments
-# morpho_df
+# size_ind_df
+
+# subseting data for size-distrib-forams species
+data <- morpho_df[which(morpho_df$species %in% species_names), ]
+data_pop <- morpho_stats[which(morpho_stats$species %in% species_names), ]
 
 
-test_morpho_ind <- function(morpho_df){}
-      
-      if (!file.exists("output/size_histograms")){
+# individual - data
+sample_size <- data.frame(species = character(), resample = numeric(), buckley = numeric())
+for( i in unique(data$species) ) { # i <- unique(data$species)[10]
   
-        dir.create("output/size_histograms")
-        
-        for( i in unique(morpho_df$species) ){ # i <- unique(morpho_df$species)[10]
-          # One species, two Datasets:
-          morpho_df_subset <- morpho_df[which(morpho_df$species == i), ]
-          p <-  ggplot(morpho_df_subset,aes(x=area_log, fill = dataset)) + 
-                        geom_histogram(binwidth = 0.1, alpha=0.5, position="identity") +
-                        scale_fill_manual(values = c("red","blue")) +
-                        labs(x="Log(area)",y="Number of individuals", title=unique(morpho_df_subset$sspname)) +
-                        theme(plot.title = element_text(face = "bold.italic", size = 14))
-          
-          pdf(file = paste("output/size_histograms/", i, ".pdf", sep = ""), width=12, height=6, paper = "special")
-            print(p)
-          dev.off()
-        } # for species
-      } # if
-      
+  subset <- data[which(data$species == i), ]
+  dfA <- subset[which(subset$datasetAB == "A"), ] # Resample
+  dfB <- subset[which(subset$datasetAB == "B"), ] # Buckley
+  
+  sample_size <- rbind(sample_size, data.frame(species = i, resample = length(dfA[,1]), buckley = length(dfB[,1])))
+  write.csv(sample_size, "output/bias-size-distrib-forams/sample_size.csv", row.names = FALSE)
+  
+  kstest <- ks.test(x=dfA$area_log, y=dfB$area_log, alternative = c("two.sided"),exact = NULL)
+  capture.output(kstest,file=paste("output/bias-size-distrib-forams/kstest/",i, "_kstest.txt", sep=""))
+}
+
+
+
+test_morpho_ind <- function(size_ind_df){}
+
       ### Checking normality of the data - Shapiro Wilk normality test
       # H0: sample x came from a normally distributed population
       # p-value < 0.05 : reject H0 -> x not normally distributed
       
-      dfA <- morpho_df_subset[which(morpho_df_subset$datasetAB == "A"), ] # Resample
-      dfB <- morpho_df_subset[which(morpho_df_subset$datasetAB == "B"), ] # Buckley
+      dfA <- size_ind_df_subset[which(size_ind_df_subset$datasetAB == "A"), ] # Resample
+      dfB <- size_ind_df_subset[which(size_ind_df_subset$datasetAB == "B"), ] # Buckley
       
       # with(dfA, tapply(area_log, species, shapiro.test))
       shap <- shapiro.test(dfA$area_log)
@@ -51,20 +53,20 @@ test_morpho_ind <- function(morpho_df){}
       ks.same <- data.frame(species = character(), sample = integer(), p = numeric(),stringsAsFactors=FALSE)
       ks.diff <- data.frame(species = character(), sample = integer(), p = numeric(),stringsAsFactors=FALSE)
       
-      morpho_df_subset <- morpho_df[which(morpho_df$species == i), ]
+      size_ind_df_subset <- size_ind_df[which(size_ind_df$species == i), ]
       
-      if(any(duplicated(morpho_df_subset$area_log))){
+      if(any(duplicated(size_ind_df_subset$area_log))){
             print(paste(i, "ties"))
             duplicates <- c()
-            dupli <- morpho_df_subset[which(duplicated(morpho_df_subset$area_log)),"area_log"]
+            dupli <- size_ind_df_subset[which(duplicated(size_ind_df_subset$area_log)),"area_log"]
               for (i in 1:length(dupli)){
-                duplicates <- c(duplicates, which(morpho_df_subset$area_log==dupli[i]))
+                duplicates <- c(duplicates, which(size_ind_df_subset$area_log==dupli[i]))
               }
-              print(morpho_df_subset[duplicates,])
+              print(size_ind_df_subset[duplicates,])
             }
             
-            dfA <- morpho_df_subset[which(morpho_df_subset$datasetAB == "A"), ] # Resample
-            dfB <- morpho_df_subset[which(morpho_df_subset$datasetAB == "B"), ] # Buckley
+            dfA <- size_ind_df_subset[which(size_ind_df_subset$datasetAB == "A"), ] # Resample
+            dfB <- size_ind_df_subset[which(size_ind_df_subset$datasetAB == "B"), ] # Buckley
             
             all(unique(dfA$sample) == unique(dfB$sample))
             ks.sample <- data.frame(sample=double(),D=double(), p=double())

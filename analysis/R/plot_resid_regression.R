@@ -1,85 +1,15 @@
 ### Description
-# Statistical tests of populational size measuremens (95q, mean, max)
+# regression of the residuals of model buckley = resample
 
 ### Arguments
-# morpho_stats
+# res : melt(residuals[[i]]) (residuals: list, output of get_size_pop_residuals.R)
+# overwrite : TRUE or FALSE (if the output file already exist, do you want to re-run the function and overwrite it?)
 
-
-morpho_stats <- read.csv("Bias_analysis/data_morpho/bias_morpho_populations.csv", header = TRUE, stringsAsFactors=FALSE)
-
-list.split <- split(morpho_stats, morpho_stats$datasetAB) # split accordingly to datasetAB
-colnames(list.split$A)[6:19] <- paste(colnames(list.split$A)[6:19],"A", sep = "")
-colnames(list.split$B)[6:19] <- paste(colnames(list.split$B)[6:19],"B", sep = "")
-morpho_statsAB <- cbind(list.split$A,list.split$B[6:19])
-morpho_statsAB <- morpho_statsAB[,-4] # drop duplicate column 'datasetAB'
-
-
-
-########################################################
-######################## STATS #########################
-########################################################
-names(morpho_statsAB)
-
-lmedian <- lm(area_log_medianB ~ area_log_medianA, morpho_statsAB)
-summary(lmedian)
-
-lmean <- lm(area_log_meanB ~ area_log_meanA, morpho_statsAB)
-summary(lmean)
-
-l75q <- lm(area_log_75qB ~ area_log_75qA, morpho_statsAB)
-summary(l75q)
-
-l95q <- lm(area_log_95qB ~ area_log_95qA, morpho_statsAB)
-summary(l95q)
-
-lmax <- lm(area_log_maxB ~ area_log_maxA, morpho_statsAB)
-summary(lmax)
-
-# Analysing a bit 
-lmax$coefficients
-lmax$predicted <- predict(lmax)   # Save the predicted values
-lmax$residuals <- residuals(lmax)
-flmax <- fortify(lmax)
-ggplot(flmax, aes(x = .fitted, y = .resid)) + geom_point()
-plot(lmax)
-head(fortify(lmax))
-
-
-
-### Fitting all to the model: intercept = 0, slope = 1
-
-rmax <- morpho_statsAB$area_log_maxB - morpho_statsAB$area_log_maxA 
-rmean <- morpho_statsAB$area_log_meanB - morpho_statsAB$area_log_meanA 
-rmedian <- morpho_statsAB$area_log_medianB - morpho_statsAB$area_log_medianA 
-r95q <- morpho_statsAB$area_log_95qB - morpho_statsAB$area_log_95qA 
-r75q <- morpho_statsAB$area_log_75qB - morpho_statsAB$area_log_75qA 
-
-residuals <- data.frame(rmean, rmedian, r75q, r95q, rmax)
-
-apply(residuals, 2, var)
-apply(residuals, 2, mean)
-
-res <- melt(residuals)
-str(res) 
-
-
-#########################################################
-######################### PLOTS #########################
-#########################################################
-
-### Violin plot of the residuals
-
-b <- ggplot(data = res, aes(x=variable, y=value)) + geom_violin(aes(fill=variable), position=position_dodge(width=0.8))
-
-b + labs(y = "Residuals", x = element_blank()) + ylim (-3,3) +
-    scale_x_discrete(labels=c("Mean", "Median", "75%q", "95%q", "Maximum")) + 
-    scale_fill_manual(values=c("#7c96a0","#5e5749","#a48e8e","#5d5f6d","#717f70")) +
-       theme(axis.text.y = element_text(size=14, color = "black", face="bold"), 
-            axis.title.y = element_text(size=16, color = "black", face="bold"), 
-            axis.text.x = element_text(size=16, color = "black", face="bold"), 
-            axis.ticks.x = element_blank(), legend.position="none") 
-
-
+plot_resid_regression <- function(residuals, tranfs, overwrite){
+  
+  if (!file.exists(paste("output/resid_",transf,"_violin.pdf", sep = "")) | overwrite == TRUE){
+  }
+  
 
 # Defining colors for each species
 cores21 <- c("#7c3f27","#7144ca","#c1dd44","#c949bd","#67ce59","#4b2d6b","#ccab3e","#6479c8",
@@ -176,3 +106,4 @@ b75q + geom_point(aes(colour = factor(sspname)), size = 3.5)  +  xlim(10, 14.5) 
 ) 
 dev.off()
 
+}
