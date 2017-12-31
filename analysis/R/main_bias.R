@@ -54,22 +54,47 @@ get_size_data(buckley_measurmts, resamp_size_df, overwrite = F)
 # Merges csv files from bias_size_analysis into one data.frame: bias_size_analysis.csv
 size_ind_df <- merge_size_data(overwrite = F)
 size_pop_df <- get_size_pop_data(size_ind_df, overwrite = F) # summary statistics for each ssp population of size_ind_df
+# Re-ordering the factors (species) to be phylogenetically meaningful in the plot (i.e. sister species closer in the plot)
+# size_pop_df$species <- factor(size_pop_df$species, levels = c())
 
 ### Analysis & Plots
+### Individuals
 
-# Individuals
 boxplot_size_species(size_ind_df, overwrite = F)
 boxplot_size_sample(size_ind_df, overwrite = F)
 plot_size_histograms(size_ind_df, overwrite = F)
 # test_size_ind(size_ind_df)
 
-# Populations
-resid_list <- get_size_pop_residuals(size_pop_df, file_name = "size_pop_residuals_allssp", overwrite = T)
+### Analysis & Plots
+### Individuals
+transf<- c("log") # "sqrt"
 
-transf<- "log" # "sqrt"
-resid_list$stats[which.min(resid_list$stats[,paste("rss_",transf,sep="")]),"rownames"]
-res <- melt(as.data.frame(resid_list[[transf]])) # warning ok 
+# checking order of sspnames by max area_log_95q, for colours gradient
+size <- by(size_pop_df$area_log_95q, size_pop_df$sspname, max)
+size <- sort(size, decreasing = TRUE)
+# names(size)
+
+# Regression plots (mean, median, 75q, 95q max)
+regress <- dcast(size_pop_df, sspname+sample~datasetAB, value.var = paste("area_",transf,"_95q",sep=""))
+plot95q <- plot_resid_regression(regress, tranfs, name="95q", overwrite=F)
+
+# Calculates residuals from regression based on 1:1 model
+resid_list <- get_size_pop_residuals(size_pop_df, file_name = "size_pop_residuals_allssp", overwrite = F)
+# resid_list$stats[which.min(resid_list$stats[,paste("mse_",transf,sep="")]),"rownames"]
+# Preparing data for residual plots & plots
+res <- melt(as.data.frame(resid_list[[transf]]), id = c("species","sspname","sample")) # warning ok 
 plot_resid_histogram(res, transf, overwrite = F)
-plot_resid_violin(res, transf, overwrite = F) 
+violin <- plot_resid_violin(res, resid_list$stats, transf, overwrite = F) 
+
+# Plot for publication
+# Uses violin and plot95q - so set overwrite to TRUE to run the plot below
+if (!is.null(violin) & !is.null(plot95q)){
+  pdf(file = "output/manuscript_ggarrange.pdf", paper = "special", width=15, height=6)
+    print(ggarrange(violin, plot95q, ncol = 2, nrow = 1, align="h", widths = c(0.45, 0.55), 
+                    labels = c("(a)", "(b)"), label.x = c(0,-0.013),
+                    font.label = list(size = 18, color = "black", face = "bold", family = NULL)))
+  dev.off()
+}
+
 
 

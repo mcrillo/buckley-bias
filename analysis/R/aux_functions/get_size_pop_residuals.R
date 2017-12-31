@@ -38,11 +38,13 @@ get_size_pop_residuals <- function(size_pop_df, file_name, overwrite){
     # Mean squared error
     mse_log <- apply(res_log, 2, function(x) sum(x^2)/length(x))
     mse_sqrt <- apply(res_sqrt, 2, function(x) sum(x^2)/length(x))
+    rownames <- gsub("sqrt_","", colnames(res_sqrt))  # to save in list
     
-
+    # Adding sample and species info
+    res_log  <- cbind(buckley[,c("species","sspname","sample")],res_log)
+    res_sqrt <- cbind(buckley[,c("species","sspname","sample")],res_sqrt)
     
     # Joining everything into a list
-    rownames <- gsub("sqrt_","", colnames(res_sqrt))  # to save in list
     residuals <- list(sqrt = res_sqrt, log = res_log, stats = data.frame(rownames,rss_log,rss_sqrt,mse_log,mse_sqrt))
     
     function_write_list(residuals, wb_name = paste("output/",file_name,".xlsx", sep = ""))

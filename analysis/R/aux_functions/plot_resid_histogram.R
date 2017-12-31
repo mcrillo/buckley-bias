@@ -10,7 +10,7 @@ plot_resid_histogram <- function(res, transf, overwrite){
   if (!file.exists(paste("output/resid_",transf,"_histogram.pdf", sep = "")) | overwrite == TRUE){
     
     if(transf == "log") bin = 0.1
-    if(transf == "sqrt") bin = 10
+    if(transf == "sqrt") bin = 20
     
     hist_res <- ggplot(res, aes(x=value)) + geom_histogram(binwidth = bin) + 
       facet_grid(variable ~ .) + # horiz.: facet_grid(. ~ species)
