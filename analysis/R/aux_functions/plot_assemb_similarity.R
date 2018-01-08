@@ -5,10 +5,11 @@
 ### Arguments
 # assemb_sim_list
 # cores10
+# overwrite : TRUE or FALSE (if the output file already exist, do you want to re0run the function and overwrite it?)
 
-plot_assemb_similarity <- function(assemb_sim_list, cores10){ # list, string
+plot_assemb_similarity <- function(assemb_sim_list, cores10, overwrite){ # list, string
         
-        if (!file.exists("output/assemb_similarity")){
+        if (!file.exists("output/assemb_similarity")| overwrite == TRUE){
           
             dir.create("output/assemb_similarity")
       

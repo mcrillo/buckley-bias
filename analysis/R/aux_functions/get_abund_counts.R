@@ -1,3 +1,14 @@
+### Description
+# 
+# creates: counts_absolute.csv
+
+### Usage
+# get_abund_relat(forcens_df, overwrite = TRUE/FALSE)
+
+### Arguments
+# forcens_df
+# overwrite : TRUE re-run anyway, FALSE do not re-run if file already exist
+
 
 
 get_abund_counts <- function(forcens_df, overwrite){ 
@@ -9,7 +20,7 @@ get_abund_counts <- function(forcens_df, overwrite){
     
     }else{
     
-          raw_counts <- read.csv("data/raw_data/counts_raw_R.csv", header = TRUE, stringsAsFactors = FALSE)
+          raw_counts <- read.csv("data/raw_data_counts/counts_raw_R.csv", header = TRUE, stringsAsFactors = FALSE)
         
           colnames(raw_counts) <- c("species","5A","5B","5C","10A","10B","10C","20A","20B","20C","25A","25B","25C","27A","27B","27C",	
                                         "31A","31B","31C","44A","44B","44C","46A","46B","46C","55A","55B","55C","66A","66B","66C")

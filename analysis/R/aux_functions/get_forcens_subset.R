@@ -1,5 +1,5 @@
 ### Description
-# 
+# Finds neighbours in ForCenS (and matches species names)
 # requires: data/forcens_woa.csv
 # creates: data/forcens_coord_dist.csv & data/forcens_subset.csv
 

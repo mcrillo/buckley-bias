@@ -23,7 +23,7 @@ plot_resid_regression <- function(regress, tranfs, name, overwrite){
       geom_point(aes(colour = factor(sspname)), size = 3)  +  xlim(10, 14) + ylim(10, 14) +   
       geom_abline(intercept = 0, slope = 1, linetype = "dotted", lwd=1) + 
       annotate("text", label = "1:1",fontface =2, x =13.3, y = 13, size = 7, colour = "black") +
-      labs(y = "Buckley Collection (95%ile)", x = "Resamples (95%ile)") +
+      labs(y = "Buckley Collection (log(size) 95%ile)", x = "Resamples (log(size) 95%ile)") +
       scale_color_viridis(discrete=TRUE, name= c("Species (by size)"), option="plasma") + 
       guides(col = guide_legend(ncol = 1), fill = guide_legend(title = "Species")) +
       theme(axis.text=element_text(size=18), #aspect.ratio = 1,

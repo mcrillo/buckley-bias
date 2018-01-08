@@ -9,6 +9,8 @@
 ### Note (for files names)
 A = my assemblage (Resamples)
 B = Buckley's assemblage
+C = ForCenS
+L = LGM data
 
 
 ### Folder morpho_bias_raw
