@@ -22,7 +22,7 @@ plot_similarity <- function(overwrite){ # list, string
     s <- ggplot(sim_data, aes(x=abs_lat, y=Estimate, shape=timing, colour=timing)) +
       geom_point(size=4)  + ylim(0,1) +
       geom_errorbar(aes(ymin=lci, ymax=uci), width=.3) +
-      labs(y = "Assemblage similarity", x = "Resamples (by absolute latitude)") +
+      labs(y = "Assemblage similarity (Horn index)", x = "Historical samples (by absolute latitude)") +
       theme(axis.text=element_text(size=18), 
           axis.title=element_text(size=18),
           #axis.text.x=element_blank(),
