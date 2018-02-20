@@ -44,7 +44,7 @@ plot_assemb_similarity(assemb_sim_list, cores10, overwrite = FALSE) # creates "o
 lgm_df <- get_abund_relat_lgm(overwrite=FALSE)
 
 ### Graph Holocene vs. LGM 
-plot_similarity(overwrite=FALSE)
+plot_similarity(overwrite=T)
 
 
 

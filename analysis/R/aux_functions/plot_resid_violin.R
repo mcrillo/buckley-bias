@@ -28,7 +28,8 @@ plot_resid_violin <- function(res, stats, transf, overwrite){
       labs(y = "Residuals", x = element_blank()) + ylim(ymin,ymax) +
       scale_x_discrete(labels=c("Mean", "Median", "75%ile", "95%ile", "Max")) + 
       scale_fill_viridis(discrete=TRUE, name= c("Species"), option="plasma") + 
-      theme(axis.text = element_text(size=18, color = "black"), 
+      theme(axis.text = element_text(size=18, color = "black"),
+            axis.line = element_line(size = 1, colour = "black"),
             axis.title.y = element_text(size=18, color = "black"), 
             legend.position="none") +
       geom_label(data=data.frame(), aes(x=1:5, y=ylabel, label=round(mse[,2],rd)), colour = "black", size=6.5)
@@ -99,6 +100,7 @@ plot_resid_violin <- function(res, stats, transf, overwrite){
       scale_x_discrete(labels=c("Mean", "Median", "75%ile", "95%ile", "Max")) + 
       theme(axis.text = element_text(size=18, color = "black"), 
             axis.title.y = element_text(size=18, color = "black"), 
+            axis.line = element_line(colour = "black"),
             legend.position="none") +
       geom_label(data=data.frame(), aes(x=1:5, y=ylabel, label=round(mse[,2],rd)), colour = "black", size=6.5)
     

@@ -31,10 +31,11 @@ plot_resid_regression <- function(regress, tranfs, name, overwrite){
                                      "G. calida","G. glutinata","N. pachyderma","G. tenellus","G. falconensis",    
                                      "T. humilis","G. rubescens")) +
       guides(col = guide_legend(ncol = 1), fill = guide_legend(title = "Species")) +
-      theme(axis.text=element_text(size=18), #aspect.ratio = 1,
-            axis.title=element_text(size=18),
+      theme(axis.text=element_text(size=18, color = "black"), #aspect.ratio = 1,
+            axis.title=element_text(size=18, color = "black"),
             legend.text = element_text(size=14,face="italic"), 
-            legend.title = element_text(size=14,face="bold"))
+            legend.title = element_text(size=14,face="bold"),
+            axis.line = element_line(colour = "black"))
 
     pdf(file = paste("output/resid_",transf,"_regress",name,".pdf", sep = ""), width=8, height=6, paper = "special")
       print(plot95q)
