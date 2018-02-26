@@ -53,8 +53,11 @@ plot_similarity(overwrite=T)
 ### Size Distribution ###
 #########################
 
+###
 ### Data
-# Creates files in data/bias_size_analysis
+###
+
+# Merges resample size data with Buckley's size data, creates files in data/bias_size_analysis
 get_size_data(buckley_measurmts, resamp_size_df, overwrite = F) 
 # Merges csv files from bias_size_analysis into one data.frame: bias_size_analysis.csv
 size_ind_df <- merge_size_data(overwrite = F)
@@ -62,14 +65,17 @@ size_pop_df <- get_size_pop_data(size_ind_df, overwrite = F) # summary statistic
 # Re-ordering the factors (species) to be phylogenetically meaningful in the plot (i.e. sister species closer in the plot)
 # size_pop_df$species <- factor(size_pop_df$species, levels = c())
 
+
+###
 ### Analysis & Plots
+###
+
 ### Individuals
 boxplot_size_species(size_ind_df, overwrite = F)
 boxplot_size_sample(size_ind_df, overwrite = F)
 plot_size_histograms(size_ind_df, overwrite = F)
 # test_size_ind(size_ind_df)
 
-### Analysis & Plots
 ### Populations
 transf<- c("log") # "sqrt"
 
@@ -99,5 +105,15 @@ if (!is.null(violin) & !is.null(plot95q)){
                     font.label = list(size = 18, color = "black", face = "bold", family = NULL)))
 dev.off()}
 
+
+
+
+
+###############################
+### Ecological Optimum test ###
+###############################
+pop_data <- merge_size_abund(size_pop_df, assemb_relat_df, overwrite=F)
+lmer_resample_size_pop(pop_data)
+  
 
 

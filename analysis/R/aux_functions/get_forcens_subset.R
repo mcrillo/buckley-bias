@@ -20,7 +20,7 @@ get_forcens_subset <- function(resamples_df, overwrite){
         
       }else{
         
-        forcens_df <- read.csv("data/raw_data/forcens_woa.csv", header = TRUE)
+        forcens_df <- read.csv("data/raw_data/ForCenS_woa.csv", header = TRUE)
       
         # Joining Buckley + Resample + forcens (all transformed into relative abundance data)
         coord_dist <- data.frame()

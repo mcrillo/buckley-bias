@@ -1,7 +1,11 @@
 
 # Packages for main_bias.R
 
+library(plyr)
+library(dplyr)
+library(tidyr)
 library(R.utils) # sourceDirectory
+
 library(ggplot2)
 library(sp)
 library(maps)
@@ -21,3 +25,6 @@ library(RColorBrewer) # colours of plots
 library(viridis) # colours of plots
 library(XLConnect)
 library(XLConnectJars)
+
+library(lme4)
+library(MuMIn)
