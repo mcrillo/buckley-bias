@@ -27,7 +27,7 @@ plot_resid_regression <- function(regress, tranfs, name, overwrite){
       scale_color_viridis(discrete=TRUE, name= c("Species (by size)"), option="plasma", 
                           labels = c("G. menardii *","G. tumida","T. sacculifer *","G. conglobatus *",  
                                      "G. truncatulinoides *","O. universa","G. siphonifera *","P. obliquiloculata *", 
-                                     "G. crassaformis","N.dutertrei *","G. scitula","G. inflata *","G. ruber *",           
+                                     "G. crassaformis","N. dutertrei *","G. scitula","G. inflata *","G. ruber *",           
                                      "G. calida","G. glutinata","N. pachyderma","G. tenellus","G. falconensis",    
                                      "T. humilis","G. rubescens")) +
       guides(col = guide_legend(ncol = 1), fill = guide_legend(title = "Species")) +
