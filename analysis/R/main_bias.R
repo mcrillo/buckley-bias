@@ -65,6 +65,7 @@ size_pop_df <- get_size_pop_data(size_ind_df, overwrite = F) # summary statistic
 # Re-ordering the factors (species) to be phylogenetically meaningful in the plot (i.e. sister species closer in the plot)
 # size_pop_df$species <- factor(size_pop_df$species, levels = c())
 
+data.frame(ssp_resample = unique(size_pop_df[which(size_pop_df[,"datasetAB"] == "A"), "sspname"]))
 
 ###
 ### Analysis & Plots
