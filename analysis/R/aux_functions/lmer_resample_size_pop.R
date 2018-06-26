@@ -24,6 +24,7 @@ lmer_resample_size_pop <- function(pop_data){
     # http://rinterested.github.io/statistics/mixed_effects_comparison.html
     anova_0_0abund <- anova(lmm_0, lmm_0abund, refit=FALSE) 
     print(anova_0_0abund) # abundance
+    print(xtable(as.data.frame(anova_0_0abund)), include.rownames=FALSE) # LaTeX
     
     
     ### R-squared of mixed-effects models
@@ -32,6 +33,6 @@ lmer_resample_size_pop <- function(pop_data){
     # and the conditional R^2 (R2c) associated with your fixed effects plus the random effects 
     # Usually we will be interested in the marginal effects...
     print(rbind(lmm_0 = r.squaredGLMM(lmm_0), lmm_0abund = r.squaredGLMM(lmm_0abund)))
-
+    
     
 }

@@ -45,9 +45,6 @@ plot_similarity <- function(overwrite){ # list, string
                                 expression("40"*degree),
                                 expression("50"*degree),
                                 expression("85"*degree)))
-
-    #                                           expression("20"*degree*E),
-
       
     pdf(file = "output/similarity.pdf", width=8, height=6, paper = "special")
       print(s)

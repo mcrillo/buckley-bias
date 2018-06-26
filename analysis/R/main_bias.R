@@ -19,6 +19,12 @@ resamp_size_df <- read.csv("data/resample_info_size.csv", header = TRUE, strings
 plot_map_resamples(resamples_df, overwrite = FALSE) # creates: output/resamples_map.pdf
 
 
+### Resample table for manuscript
+# table_resample <- read.csv("data/manuscript_resample_info.csv", header = T)
+# table_resample
+# print(xtable(table_resample), include.rownames=FALSE) # LaTeX
+
+
 
 ##############################
 ### Assemblage Composition ###
@@ -44,7 +50,7 @@ plot_assemb_similarity(assemb_sim_list, cores10, overwrite = FALSE) # creates "o
 lgm_df <- get_abund_relat_lgm(overwrite=FALSE)
 
 ### Graph Holocene vs. LGM 
-plot_similarity(overwrite=T)
+plot_similarity(overwrite=F)
 
 
 
@@ -67,6 +73,12 @@ size_pop_df <- get_size_pop_data(size_ind_df, overwrite = F) # summary statistic
 
 data.frame(ssp_resample = unique(size_pop_df[which(size_pop_df[,"datasetAB"] == "A"), "sspname"]))
 
+
+max_diam <- by(size_ind_df$diam.max, size_ind_df$species, function(x) max(x, na.rm = T))
+min_diam <- by(size_ind_df$diam.max, size_ind_df$species, function(x) min(x, na.rm = T))
+cbind(max_diam, min_diam)
+
+
 ###
 ### Analysis & Plots
 ###
@@ -87,7 +99,7 @@ size <- sort(size, decreasing = TRUE)
 
 # Regression plots (mean, median, 75q, 95q max)
 regress <- dcast(size_pop_df, sspname+sample~datasetAB, value.var = paste("area_",transf,"_95q",sep=""))
-plot95q <- plot_resid_regression(regress, tranfs, name="95q", overwrite=T)
+plot95q <- plot_resid_regression(regress, tranfs, name="95q", overwrite=F)
 
 # Calculates residuals from regression based on 1:1 model
 resid_list <- get_size_pop_residuals(size_pop_df, file_name = "size_pop_residuals_allssp", overwrite = F)
@@ -95,7 +107,7 @@ resid_list <- get_size_pop_residuals(size_pop_df, file_name = "size_pop_residual
 # Preparing data for residual plots & plots
 res <- melt(as.data.frame(resid_list[[transf]]), id = c("species","sspname","sample")) # warning ok 
 plot_resid_histogram(res, transf, overwrite = F)
-violin <- plot_resid_violin(res, resid_list$stats, transf, overwrite = T) 
+violin <- plot_resid_violin(res, resid_list$stats, transf, overwrite = F) 
 
 # Plot for publication
 # Uses violin and plot95q - so set overwrite to TRUE to run the plot below
@@ -113,8 +125,11 @@ dev.off()}
 ###############################
 ### Ecological Optimum test ###
 ###############################
+
+### Linear mixed-effects regression
 pop_data <- merge_size_abund(size_pop_df, assemb_relat_df, overwrite=F)
 lmer_resample_size_pop(pop_data)
-  
+
+
 
 
