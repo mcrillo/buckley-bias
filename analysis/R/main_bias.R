@@ -47,6 +47,41 @@ plot_assemb_similarity(assemb_sim_list, cores10, overwrite = FALSE) # creates "o
 
 
 ### Data LGM
+atlantic_lgm <- read.csv("data/lgm_data/MARGO_Atlantic_LGM_PF.csv", header = TRUE, stringsAsFactors=FALSE)
+indo_pacific_lgm <- read.csv("data/lgm_data/MARGO_IndoPac_LGM_PF.csv", header = TRUE, stringsAsFactors=FALSE)
+pacific_lgm <- read.csv("data/lgm_data/MARGO_Pacific_LGM_PF.csv", header = TRUE, stringsAsFactors=FALSE)
+
+indo_pacific_lgm <- indo_pacific_lgm [-which(indo_pacific_lgm[,c("Long")]>180),]
+
+## point: vector of two numbers (longitude, latitude) 
+## findin: a matrix of 2 columns (first one is longitude, second is latitude) 
+## distance: if 0 finds nearest neighbour, if a positive value (in meters) finds neighbours within a circle with the value radius
+
+i=1
+
+lgm_neighbs <- data.frame()
+
+atl <- find_neighbours(point = as.numeric(resamples_df[i,c("Long","Lat")]), findin = atlantic_lgm[,c("Long","Lat")], distance = 0)
+ip <- find_neighbours(point = as.numeric(resamples_df[i,c("Long","Lat")]), findin = indo_pacific_lgm[,c("Long","Lat")], distance = 0)
+pac <- find_neighbours(point = as.numeric(resamples_df[i,c("Long","Lat")]), findin = pacific_lgm[,c("Long","Lat")], distance = 0)
+
+
+if(which.min(c(atl$distance, ip$distance, pac$distance))==1){ # Atlantic
+  lgm_neighbs[i,] <- cbind(atl, atlantic_lgm[atl$row_findin,])
+}
+  
+if(which.min(c(atl$distance, ip$distance, pac$distance))==2){ # Indo-Pacific
+  
+}
+  
+if(which.min(c(atl$distance, ip$distance, pac$distance))==3){ # Pacific
+  
+}
+    
+
+
+# Old
+
 lgm_df <- get_abund_relat_lgm(overwrite=FALSE)
 
 ### Graph Holocene vs. LGM 

@@ -1,0 +1,27 @@
+/* DATA DESCRIPTION:
+Citation:	Siccha, Michael; Kucera, Michal (2017): Compilation of planktonic foraminifera census counts in marine surface sediment samples (ForCenS). PANGAEA, https://doi.org/10.1594/PANGAEA.873570, 
+	Supplement to: Siccha, M; Kucera, M (2017): ForCenS, a curated database of planktonic foraminifera census counts in marine surface sediment samples. Scientific Data, 4, 170109, https://doi.org/10.1038/sdata.2017.109
+Abstract:	Census counts of marine microfossils in surface sediments represent an invaluable resource for paleoceanography and for the investigation of macroecological processes. A prerequisite for such applications is the provision of syntheses data for individual microfossil groups. Specific to such syntheses is the necessity of taxonomical harmonisation across the constituent datasets, coupled with dereplication of previous compilations. Both of these aspects require expert knowledge, but with increasing num-ber of records involved in such syntheses, the application of expert knowledge via manual curation is not feasible. Here we present a synthesis of planktonic foraminifera census counts in surface sediment samples, which is taxonomically harmonised, dereplicated and treated for numerical and other inconsistencies. The data treatment is implemented as an objective and largely automated pipeline, allowing us to reduce the initial 6928 records to 4192 counts from unique sites and informative technical or true replicates. We provide the final product and document the procedure, which can be easily adopted for other microfossil data syntheses.
+Related to:	Barrows, Timothy T; Juggins, Steve (2005): Compilation of planktic foraminifera modern data from the Indo-Pacific Ocean. https://doi.org/10.1594/PANGAEA.227317
+	CLIMAP Project Members (2009): Planktic foraminifera counts in surface sediment samples. https://doi.org/10.1594/PANGAEA.51927
+	Hayes, Angela; Kucera, Michal; Kallel, Nejib; Sbaffi, Laura; Rohling, Eelco J (2005): Compilation of planktic foraminifera modern data from the Mediterranean Sea. https://doi.org/10.1594/PANGAEA.227305
+	Hüls, Matthias (1999): Distribution of planktic foraminifera in surface sediments. https://doi.org/10.1594/PANGAEA.55758
+	Kucera, Michal; Weinelt, Mara; Kiefer, Thorsten; Pflaumann, Uwe; Hayes, Angela; Weinelt, Martin; Chen, Min-Te; Mix, Alan C; Barrows, Timothy T; Cortijo, Elsa; Duprat, Josette M; Juggins, Steve; Waelbroeck, Claire (2005): Compilation of planktic foraminifera census data, modern from the Atlantic Ocean. https://doi.org/10.1594/PANGAEA.227322
+	Kucera, Michal; Weinelt, Mara; Kiefer, Thorsten; Pflaumann, Uwe; Hayes, Angela; Weinelt, Martin; Chen, Min-Te; Mix, Alan C; Barrows, Timothy T; Cortijo, Elsa; Duprat, Josette M; Juggins, Steve; Waelbroeck, Claire (2005): Compilation of planktic foraminifera census data, modern from the Pacific Ocean. https://doi.org/10.1594/PANGAEA.227323
+	Mohtadi, Mahyar; Hebbeln, Dierk; Marchant, Margarita (2005): Faunal distribution of the most important planktic foraminiferal species in the investigated surface sediment samples from the Chilean continental slope between 23°S and 44°S. https://doi.org/10.1594/PANGAEA.351143
+	Munz, Philipp; Siccha, Michael; Lückge, Andreas; Böll, Anna; Kucera, Michal; Schulz, Hartmut (2015): Distribution of planktic foraminifera in surface sediments in the northeastern Arabian Sea. https://doi.org/10.1594/PANGAEA.853966
+	Pflaumann, Uwe; Sarnthein, Michael; Chapman, Mark R; de Abreu, Lucia; Funnell, Brian M; Hüls, Matthias; Kiefer, Thorsten; Maslin, Mark A; Prahl, Frederick G; Swallow, John; van Kreveld, Shirley A; Vautravers, Maryline J; Vogelsang, Elke; Weinelt, Mara (2003): Distribution of planktic foraminifera in surface sediments of the Atlantic Ocean (ATL947). https://doi.org/10.1594/PANGAEA.77352
+	Salgueiro, Emilia; Voelker, Antje H L; Abrantes, Fatima F; Meggers, Helge; Pflaumann, Uwe; Loncaric, Neven; González-Álvarez, Raquel; Oliveira, Paulo; Bartels-Jonsdottir, Helga B; Moreno, Joao; Wefer, Gerold (2008): (Fig. 3a-e) Distribution of planktonic foraminifera in surface sediments. https://doi.org/10.1594/PANGAEA.743252
+Further details:	NOAA: Paleoclimatology Data (URI: https://www.ncdc.noaa.gov/data-access/paleoclimatology-data)
+	Siccha, Michael; Trommer, Gabriele; Schulz, Hartmut; Hemleben, Christoph; Kucera, Michal (2009): Factors controlling the distribution of planktonic foraminifera in the Red Sea and implications for the development of transfer functions. Marine Micropaleontology, 72(3-4), 146-156, https://doi.org/10.1016/j.marmicro.2009.04.002
+Project(s):	Center for Marine Environmental Sciences (MARUM) (URI: http://www.marum.de/en/)
+Parameter(s):	File name (File name) * PI: Siccha, Michael (https://orcid.org/0000-0002-2039-5535, msiccha@marum.de)
+	File format (File format) * PI: Siccha, Michael (https://orcid.org/0000-0002-2039-5535, msiccha@marum.de)
+	File size [kByte] (File size) * PI: Siccha, Michael (https://orcid.org/0000-0002-2039-5535, msiccha@marum.de)
+	Uniform resource locator/link to file (URL file) * PI: Siccha, Michael (https://orcid.org/0000-0002-2039-5535, msiccha@marum.de)
+License:	Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported (CC-BY-NC-SA)
+Size:	8 data points
+*/
+File name	File format	File size [kByte]	URL file
+ForCenS	TXT	6040.000	http://store.pangaea.de/Publications//Siccha-Kucera_2017/ForCenS.txt
+ForCenS_reduced	TXT	2299.000	http://store.pangaea.de/Publications//Siccha-Kucera_2017/ForCenS_reduced.txt
