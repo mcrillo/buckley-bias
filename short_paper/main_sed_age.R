@@ -68,7 +68,8 @@ if (!file.exists("ForCenS_subset.csv") | !file.exists("LGM_subset.csv")){
 }
 
 # Distance (in km) between historical sample and LGM and ForCenS nearest sample
-data.frame(sample=holocene$sample, 
+data.frame(sample=historical$sample, 
+           lat=historical$Lat,
            sed_cm_ky=lgm$sedimentation.rate..cm.ky., 
            lgm=lgm$distance/1000,
            holocene=holocene$distance/1000, 
@@ -190,26 +191,32 @@ if (!file.exists("similarity.csv")){
     sim_holo_data <- historical_holocene[,grep(names(historical_holocene), pattern = i)]
     sim_holo_i <- SimilarityPair(as.matrix(sim_holo_data), datatype = c("abundance"))
     sim_holo <- rbind(sim_holo, 
-                      cbind(rbind(c02 = sim_holo_i$Empirical_richness[1,],
-                                  c12 = sim_holo_i$Empirical_relative[1,],
-                                  c22 = sim_holo_i$Empirical_relative[2,]),
-                            sample = rep(i, 3)))
+                      cbind(rbind(c02 = sim_holo_i$estimated_richness[1,],
+                                  c12 = sim_holo_i$estimated_relative[1,],
+                                  c22 = sim_holo_i$estimated_relative[2,],
+                                  chao_jaccard  = sim_holo_i$estimated_relative[4,],
+                                  chao_sorensen = sim_holo_i$estimated_relative[5,]),
+                            sample = rep(i, 5)))
     
     sim_lgm_data <- historical_lgm[,grep(names(historical_lgm), pattern = i)]
     sim_lgm_i <- SimilarityPair(as.matrix(sim_lgm_data), datatype = c("abundance"))
     sim_lgm <- rbind(sim_lgm, 
-                     cbind(rbind(c02 = sim_lgm_i$Empirical_richness[1,],
-                                 c12 = sim_lgm_i$Empirical_relative[1,],
-                                 c22 = sim_lgm_i$Empirical_relative[2,] ),
-                           sample = rep(i, 3)))
+                     cbind(rbind(c02 = sim_lgm_i$estimated_richness[1,],
+                                 c12 = sim_lgm_i$estimated_relative[1,],
+                                 c22 = sim_lgm_i$estimated_relative[2,],
+                                 chao_jaccard  = sim_lgm_i$estimated_relative[4,],
+                                 chao_sorensen = sim_lgm_i$estimated_relative[5,]),
+                           sample = rep(i, 5)))
     
     sim_null_data <- holocene_lgm[,grep(names(holocene_lgm), pattern = i)]
     sim_null_i <- SimilarityPair(as.matrix(sim_null_data), datatype = c("abundance"))
     sim_null <- rbind(sim_null, 
-                     cbind(rbind(c02 = sim_null_i$Empirical_richness[1,],
-                                 c12 = sim_null_i$Empirical_relative[1,],
-                                 c22 = sim_null_i$Empirical_relative[2,] ),
-                           sample = rep(i, 3)))
+                      cbind(rbind(c02 = sim_null_i$estimated_richness[1,],
+                                  c12 = sim_null_i$estimated_relative[1,],
+                                  c22 = sim_null_i$estimated_relative[2,],
+                                  chao_jaccard  = sim_null_i$estimated_relative[4,],
+                                  chao_sorensen = sim_null_i$estimated_relative[5,]),
+                            sample = rep(i, 5)))
     
     rm(sim_holo_data)
     rm(sim_holo_i)
@@ -221,19 +228,20 @@ if (!file.exists("similarity.csv")){
   }
   
   sim_holo[,c(1:4)] <- sapply(sim_holo[,c(1:4)], function(x) as.numeric(as.character(x)))
-  sim_lgm[,c(1:4)] <- sapply(sim_lgm[,c(1:4)], function(x) as.numeric(as.character(x)))
+  sim_lgm[,c(1:4)]  <- sapply(sim_lgm[,c(1:4)], function(x) as.numeric(as.character(x)))
   sim_null[,c(1:4)] <- sapply(sim_null[,c(1:4)], function(x) as.numeric(as.character(x)))
   
-  sim_holo$age <- "Historical vs. Holocene"
-  sim_lgm$age <- "Historical vs. LGM"
-  sim_null$age <- "Holocene vs. LGM"
+  sim_holo$comparison <- "Historical vs. Holocene"
+  sim_lgm$comparison  <- "Historical vs. LGM"
+  sim_null$comparison <- "Holocene vs. LGM"
   
   similarity <- rbind(sim_holo,sim_lgm,sim_null)
-  similarity$CqN <- as.factor(rep(c(0:2), nrow(similarity)/3))
   similarity$sample <- as.factor(sub("_", "", similarity$sample))
-  similarity$age <- as.factor(similarity$age)
+  similarity$comparison <- as.factor(similarity$comparison)
+  similarity$index <- row.names(similarity)
   similarity <- merge(similarity,historical[,c("sample", "Lat", "Long")])
-  names(similarity) <- c("sample","Estimate", "se", "lci", "uci", "age", "CqN", "lat", "long")
+  
+  names(similarity) <- c("sample","Estimate", "se", "lci", "uci", "comparison", "index", "lat", "long")
   
   write.csv(similarity, "similarity.csv", row.names = FALSE)
 
@@ -246,27 +254,50 @@ if (!file.exists("similarity.csv")){
 ### Plot
 ###
 
-#sim_data <- similarity[which(similarity[,"CqN"] == 0),] # Sorensen index (richness)
-sim_data <- similarity[which(similarity[,"CqN"] == 1),] # Horn index (relative abundance, abundant)
-#sim_data <- similarity[which(similarity[,"CqN"] == 2),] # Morisita-Horn index (relative abundance, rare)
+sim_data0 <- similarity[grep("c02", similarity$index),] # Sorensen index (richness)
+sim_data1 <- similarity[grep("c12", similarity$index),] # Horn index (relative abundance, abundant)
+sim_data2 <- similarity[grep("c22", similarity$index),] # Morisita-Horn index (relative abundance, rare)
+sim_data_cs <- similarity[grep("chao_sorensen", similarity$index),]
+sim_data_cj <- similarity[grep("chao_jaccard", similarity$index),]
 
 # Absolute Latitude 
-sim_data$abs_lat <- round(abs(sim_data$lat))
-sim_data <- sim_data[order(sim_data$abs_lat),]
-sim_data$abs_lat <- round(abs(sim_data$lat))
-sim_data$abs_lat <- as.factor(sim_data$abs_lat)
+sim_data0$abs_lat <- round(abs(sim_data0$lat))
+sim_data0 <- sim_data0[order(sim_data0$abs_lat),]
+sim_data0$abs_lat <- round(abs(sim_data0$lat))
+sim_data0$abs_lat <- as.factor(sim_data0$abs_lat)
+
+sim_data1$abs_lat <- round(abs(sim_data1$lat))
+sim_data1 <- sim_data1[order(sim_data1$abs_lat),]
+sim_data1$abs_lat <- round(abs(sim_data1$lat))
+sim_data1$abs_lat <- as.factor(sim_data1$abs_lat)
+
+sim_data2$abs_lat <- round(abs(sim_data2$lat))
+sim_data2 <- sim_data2[order(sim_data2$abs_lat),]
+sim_data2$abs_lat <- round(abs(sim_data2$lat))
+sim_data2$abs_lat <- as.factor(sim_data2$abs_lat)
+
+sim_data_cs$abs_lat <- round(abs(sim_data_cs$lat))
+sim_data_cs <- sim_data_cs[order(sim_data_cs$abs_lat),]
+sim_data_cs$abs_lat <- round(abs(sim_data_cs$lat))
+sim_data_cs$abs_lat <- as.factor(sim_data_cs$abs_lat)
+
+sim_data_cj$abs_lat <- round(abs(sim_data_cj$lat))
+sim_data_cj <- sim_data_cj[order(sim_data_cj$abs_lat),]
+sim_data_cj$abs_lat <- round(abs(sim_data_cj$lat))
+sim_data_cj$abs_lat <- as.factor(sim_data_cj$abs_lat)
+
   
-ggplot(sim_data, aes(x=abs_lat, y=Estimate, shape=age, colour=age)) +
-    geom_point(size=4)  + ylim(0,1) +
-    geom_errorbar(aes(ymin=lci, ymax=uci), width=.2) +
-    labs(y = "Assemblage similarity", x = "Historical samples (absolute Latitude)") +
+sorensen <- ggplot(sim_data0, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison, group = comparison)) +
+    geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
+    geom_point(position=position_dodge(width=0.5), size=4)  + ylim(0,1) +
+    labs(y = "Sorensen index", x = "Samples (by absolute Latitude)") +
     theme_bw() + 
     theme(axis.text=element_text(size=18, colour = "black"), 
           axis.title=element_text(size=22, colour = "black"),
           legend.text = element_text(size=18, colour = "black"), 
           legend.title = element_blank(),
-          legend.position = c(0.15, 0.15),
-          legend.background = element_rect(linetype="solid", colour ="black")) +
+          legend.position = c(0.25, 0.15),
+          legend.background = element_rect(linetype="solid",size = 0.4,  colour ="black")) +
     scale_color_manual(values=c("#a6611a", "#018571", "#999999")) +
     scale_shape_manual(values=c(19, 15, 17)) +
     #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
@@ -280,19 +311,125 @@ ggplot(sim_data, aes(x=abs_lat, y=Estimate, shape=age, colour=age)) +
                               expression("40"*degree),
                               expression("50"*degree)))
 
+pdf(file = "fig_sorensen.pdf", width=9, height=6, paper = "special")
+ print(sorensen)
+dev.off()
 
-# Sample number
-ggplot(sim_data, aes(x=sample, y=Estimate, shape=age, colour=age)) +
-  geom_point(size=4)  + ylim(0,1) +
-  geom_errorbar(aes(ymin=lci, ymax=uci), width=.3) +
-  labs(y = "Assemblage similarity (Horn index)", x = "Historical samples (absolute Latitude)") +
+
+horn <- ggplot(sim_data1, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison)) +
+  geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
+  geom_point(position=position_dodge(width=0.5), size=4)  + ylim(0,1) +
+  labs(y = "Horn index", x = "Samples (by absolute Latitude)") +
   theme_bw() + 
   theme(axis.text=element_text(size=18, colour = "black"), 
-        axis.title=element_text(size=18, colour = "black"),
+        axis.title=element_text(size=22, colour = "black"),
         legend.text = element_text(size=18, colour = "black"), 
         legend.title = element_blank(),
-        legend.position = c(0.85, 0.15),
-        legend.background = element_rect(linetype="solid", colour ="black")) +
+        legend.position = c(0.25, 0.15),
+        legend.background = element_rect(linetype="solid",size = 0.4, colour ="black")) +
   scale_color_manual(values=c("#a6611a", "#018571", "#999999")) +
-  scale_shape_manual(values=c(19, 15, 17))
+  scale_shape_manual(values=c(19, 15, 17)) +
+  #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
+  scale_x_discrete(labels=c(expression("1"*degree),
+                            expression("8"*degree),
+                            expression("16"*degree),
+                            expression("20"*degree),
+                            expression("21"*degree),
+                            expression("24"*degree),
+                            expression("27"*degree),
+                            expression("40"*degree),
+                            expression("50"*degree)))
+
+pdf(file = "fig_horn.pdf", width=9, height=6, paper = "special")
+ print(horn)
+dev.off()
+
+
+morisita_horn <- ggplot(sim_data2, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison)) +
+  geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
+  geom_point(position=position_dodge(width=0.5), size=4)  + ylim(0,1) +
+  labs(y = "Morisita-Horn index", x = "Samples (by absolute Latitude)") +
+  theme_bw() + 
+  theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=22, colour = "black"),
+        legend.text = element_text(size=18, colour = "black"), 
+        legend.title = element_blank(),
+        legend.position = c(0.25, 0.15),
+        legend.background = element_rect(linetype="solid", size = 0.4, colour ="black")) +
+  scale_color_manual(values=c("#a6611a", "#018571","#999999")) +
+  scale_shape_manual(values=c(19, 15, 17)) +
+  #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
+  scale_x_discrete(labels=c(expression("1"*degree),
+                            expression("8"*degree),
+                            expression("16"*degree),
+                            expression("20"*degree),
+                            expression("21"*degree),
+                            expression("24"*degree),
+                            expression("27"*degree),
+                            expression("40"*degree),
+                            expression("50"*degree)))
+
+
+pdf(file = "fig_morisita-horn.pdf", width=9, height=6, paper = "special")
+  print(morisita_horn)
+dev.off()
+
+chao_sorensen <- ggplot(sim_data_cs, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison, group = comparison)) +
+  geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
+  geom_point(position=position_dodge(width=0.5), size=4)  + ylim(0,max(sim_data_cs$uci)) +
+  labs(y = "Sorensen index", x = "Samples (by absolute Latitude)") +
+  theme_bw() + 
+  theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=22, colour = "black"),
+        legend.text = element_text(size=18, colour = "black"), 
+        legend.title = element_blank(),
+        legend.position = c(0.25, 0.15),
+        legend.background = element_rect(linetype="solid",size = 0.4,  colour ="black")) +
+  scale_color_manual(values=c("#a6611a", "#018571", "#999999")) +
+  scale_shape_manual(values=c(19, 15, 17)) +
+  #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
+  scale_x_discrete(labels=c(expression("1"*degree),
+                            expression("8"*degree),
+                            expression("16"*degree),
+                            expression("20"*degree),
+                            expression("21"*degree),
+                            expression("24"*degree),
+                            expression("27"*degree),
+                            expression("40"*degree),
+                            expression("50"*degree)))
+
+
+pdf(file = "fig_chao_sorensen.pdf", width=9, height=6, paper = "special")
+ print(chao_sorensen)
+dev.off()
+
+
+chao_jaccard <- ggplot(sim_data_cj, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison, group = comparison)) +
+  geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
+  geom_point(position=position_dodge(width=0.5), size=4)  + ylim(0,max(sim_data_cs$uci)) +
+  labs(y = "Sorensen index", x = "Samples (by absolute Latitude)") +
+  theme_bw() + 
+  theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=22, colour = "black"),
+        legend.text = element_text(size=18, colour = "black"), 
+        legend.title = element_blank(),
+        legend.position = c(0.25, 0.15),
+        legend.background = element_rect(linetype="solid",size = 0.4,  colour ="black")) +
+  scale_color_manual(values=c("#a6611a", "#018571", "#999999")) +
+  scale_shape_manual(values=c(19, 15, 17)) +
+  #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
+  scale_x_discrete(labels=c(expression("1"*degree),
+                            expression("8"*degree),
+                            expression("16"*degree),
+                            expression("20"*degree),
+                            expression("21"*degree),
+                            expression("24"*degree),
+                            expression("27"*degree),
+                            expression("40"*degree),
+                            expression("50"*degree)))
+
+
+pdf(file = "fig_chao_jaccard.pdf", width=9, height=6, paper = "special")
+print(chao_jaccard)
+dev.off()
 
