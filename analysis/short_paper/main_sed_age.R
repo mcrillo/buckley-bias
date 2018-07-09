@@ -2,7 +2,7 @@
 rm(list=ls())
 
 setwd("/Users/marinacostarillo/Google Drive/PhD/Projects")
-setwd("./buckley-bias/analysis")
+setwd("./buckley-bias/analysis/short_paper")
 
 # Libraries
 library(reshape)
@@ -10,18 +10,42 @@ library(geosphere)
 library(SpadeR)
 
 # Auxiliary functions
-source("./R/aux_functions/find_neighbours.R")
+
+find_neighbours <- function(point, findin, distance) { # vector, data.frame, numeric
+  ## point: vector of two numbers (longitude, latitude) 
+  ## findin: a matrix of 2 columns (first one is longitude, second is latitude) 
+  ## distance: if 0 finds nearest neighbour, if a positive value (in meters) finds neighbours within a circle with the value radius
+  
+  ## Returns a data.frame: 
+  ## "row" = the row number of the neighbour in data.frame
+  ## "distance" = the distance between the points
+  
+  dist_data <- apply(findin, 1, function(x) distCosine(point, x)) #Matrix
+  
+  if(distance>0) { # find neighbours within radius of distance
+    neighb <- data.frame(row_findin = which(dist_data<=distance), distance = dist_data[which(dist_data<=distance)])
+    if(length(neighb[,1])==0) distance = 0 
+  }  
+  
+  if(distance==0) { # find nearest neighbour
+    neighb <- data.frame(row_findin = which.min(dist_data), distance = min(dist_data))
+  }
+  
+  return(neighb)
+  
+}
+
 
 ###
 ### Data
 ###
 
-historical <- read.csv("data_age/historical_data.csv", header = TRUE)
+historical <- read.csv("historical_data.csv", header = TRUE)
 
-if (!file.exists("data_age/ForCenS_subset.csv") | !file.exists("data_age/LGM_subset.csv")){
+if (!file.exists("ForCenS_subset.csv") | !file.exists("LGM_subset.csv")){
   # Subsetting data to nearest neighbours
-  holocene_full <- read.csv("data_age/ForCenS_woa.csv", header = TRUE)
-  lgm_full <- read.csv("data_age/LGM_MARGO_renamed.csv", header = TRUE)
+  holocene_full <- read.csv("ForCenS_woa.csv", header = TRUE)
+  lgm_full <- read.csv("LGM_MARGO_renamed.csv", header = TRUE)
 
   lgm <- data.frame()
   holocene <- data.frame()
@@ -36,16 +60,22 @@ if (!file.exists("data_age/ForCenS_subset.csv") | !file.exists("data_age/LGM_sub
     holocene <- rbind(holocene, cbind(sample = historical$sample[i], holocene_neighb, holocene_full[holocene_neighb$row_findin,]))
   }
 
-  write.csv(holocene, "data_age/ForCenS_subset.csv", row.names = F)
-  write.csv(lgm, "data_age/LGM_subset.csv", row.names = F)
+  write.csv(holocene, "ForCenS_subset.csv", row.names = F)
+  write.csv(lgm, "LGM_subset.csv", row.names = F)
 
 }else{
-  holocene <- read.csv("data_age/ForCenS_subset.csv", header = TRUE)
-  lgm <- read.csv("data_age/LGM_subset.csv", header = TRUE)
+  holocene <- read.csv("ForCenS_subset.csv", header = TRUE)
+  lgm <- read.csv("LGM_subset.csv", header = TRUE)
 }
 
 # Distance (in km) between historical sample and LGM and ForCenS nearest sample
-data.frame(lgm=lgm$distance/1000,holocene=holocene$distance/1000)
+data.frame(sample=holocene$sample, 
+           sed_cm_ky=lgm$sedimentation.rate..cm.ky., 
+           lgm=lgm$distance/1000,
+           holocene=holocene$distance/1000, 
+           diff = (holocene$distance - lgm$distance)/1000)
+
+
 
 ###
 ### Organizating data for analysis
@@ -136,6 +166,8 @@ row.names(historical_lgm) <- historical_lgm$variable
 historical_lgm <- historical_lgm[,-which(names(historical_lgm)=="variable")]
 
 
+
+
 ###
 ### Analysis
 ###
@@ -147,15 +179,15 @@ sim_lgm <- data.frame()
 for (i in sim_samples){ # i = sim_samples[1]
   
    sim_holo_data <- historical_holocene[,grep(names(historical_holocene), pattern = i)]
-   sim_holo_i <- SimilarityPair(as.matrix(sim_holo_data), datatype = c("abundance"), nboot = 50)
-   sim_holo <- rbind(sim_holo, cbind(rbind(
-     c02 = sim_holo_i$Empirical_richness[1,],
-     c12 = sim_holo_i$Empirical_relative[1,],
-     c22 = sim_holo_i$Empirical_relative[2,]),
-     sample = rep(i, 3)))
+   sim_holo_i <- SimilarityPair(as.matrix(sim_holo_data), datatype = c("abundance"))
+   sim_holo <- rbind(sim_holo, 
+          cbind(rbind(c02 = sim_holo_i$Empirical_richness[1,],
+                      c12 = sim_holo_i$Empirical_relative[1,],
+                      c22 = sim_holo_i$Empirical_relative[2,]),
+          sample = rep(i, 3)))
    
    sim_lgm_data <- historical_lgm[,grep(names(historical_lgm), pattern = i)]
-   sim_lgm_i <- SimilarityPair(as.matrix(sim_lgm_data), datatype = c("abundance"), nboot = 50)
+   sim_lgm_i <- SimilarityPair(as.matrix(sim_lgm_data), datatype = c("abundance"))
    sim_lgm <- rbind(sim_lgm, cbind(rbind(
      c02 = sim_lgm_i$Empirical_richness[1,],
      c12 = sim_lgm_i$Empirical_relative[1,],
@@ -169,38 +201,72 @@ for (i in sim_samples){ # i = sim_samples[1]
    
 }
 
+sim_holo[,c(1:4)] <- sapply(sim_holo[,c(1:4)], function(x) as.numeric(as.character(x)))
+sim_lgm[,c(1:4)] <- sapply(sim_lgm[,c(1:4)], function(x) as.numeric(as.character(x)))
 
-##############################
-### Assemblage Composition ###
-##############################
-
-### Data Holocene
-cores10 <- c("#00b900","#0037c6", "#ff7314", "#ff60ff","#86442b","#004d41", "#db0011","#00b5ff","#8000b2", "#d0be00")
-forcens_df <- get_forcens_subset(resamples_df,overwrite=FALSE) 
-# Merging species counts (assemblages) from (A) re-samples , (B) Buckley collection and (C) ForCenS data:
-assemb_counts_df <- get_abund_counts(forcens_df, overwrite = FALSE) # creates "data/counts_merged.csv"
-assemb_relat_df <- get_abund_relat(forcens_df, overwrite = FALSE) # creates "data/counts_merged_relat.csv
+sim_holo$age <- "Holocene"
+sim_lgm$age <- "LGM"
 
 
+###
+### Plot
+###
+
+similarity <- rbind(sim_holo,sim_lgm)
+similarity$CqN <- as.factor(rep(c(0:2), nrow(similarity)/3))
+similarity$sample <- as.factor(sub("_", "", similarity$sample))
+similarity$age <- as.factor(similarity$age)
+similarity <- merge(similarity,historical[,c("sample", "Lat", "Long")])
+names(similarity) <- c("sample","Estimate", "se", "lci", "uci", "age", "CqN", "lat", "long")
+
+sim_data <- similarity[which(similarity[,"CqN"] == 0),] # Sorensen index (richness)
+sim_data  <- similarity[which(similarity[,"CqN"] == 1),] # Horn index (relative abundance)
+sim_data <- similarity[which(similarity[,"CqN"] == 2),] # Morisita-Horn index (relative abundance)
+
+sim_data$abs_lat <- round(abs(sim_data$lat))
+sim_data <- sim_data[order(sim_data$abs_lat),]
+sim_data$abs_lat <- round(abs(sim_data$lat))
+sim_data$abs_lat <- as.factor(sim_data$abs_lat)
+  
+# Absolute Latitude 
+
+ggplot(sim_data, aes(x=abs_lat, y=Estimate, shape=age, colour=age)) +
+    geom_point(size=4)  + ylim(0,1) +
+    geom_errorbar(aes(ymin=lci, ymax=uci), width=.3) +
+    labs(y = "Assemblage similarity", x = "Historical samples (absolute Latitude)") +
+    theme_bw() + 
+    theme(axis.text=element_text(size=18, colour = "black"), 
+          axis.title=element_text(size=22, colour = "black"),
+          legend.text = element_text(size=18, colour = "black"), 
+          legend.title = element_blank(),
+          legend.position = c(0.15, 0.15),
+          legend.background = element_rect(linetype="solid", colour ="black")) +
+    scale_color_manual(values=c("#a6611a", "#018571")) +
+    scale_shape_manual(values=c(19, 15)) +
+    #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
+    scale_x_discrete(labels=c(expression("1"*degree),
+                              expression("8"*degree),
+                              expression("16"*degree),
+                              expression("20"*degree),
+                              expression("21"*degree),
+                              expression("24"*degree),
+                              expression("27"*degree),
+                              expression("40"*degree),
+                              expression("50"*degree)))
 
 
-
-
-### Analysis Holocene
-# Calculating similarity index (based on Chao) for assemblages of Re-sampling X Buckley Collection X ForCenS
-assemb_sim_list <- get_assemb_similarity(assemb_counts_df, resamples_df$sample, overwrite = FALSE)
-### Plots Holocene
-# Histograms of species relative abundances for each datasets (Bias, Buckley, ForCenS), per sample
-suppressWarnings(plot_abund_histograms(assemb_relat_df, resamples_df, overwrite = FALSE)) # creates "output/abund_histograms"
-# Chao similarity index plot
-plot_assemb_similarity(assemb_sim_list, cores10, overwrite = FALSE) # creates "output/assemb_similarity"
-
-
-### Data LGM
-lgm_df <- get_abund_relat_lgm(overwrite=FALSE)
-
-### Graph Holocene vs. LGM 
-plot_similarity(overwrite=F)
-
-
+# Sample number
+ggplot(sim_data, aes(x=sample, y=Estimate, shape=age, colour=age)) +
+  geom_point(size=4)  + ylim(0,1) +
+  geom_errorbar(aes(ymin=lci, ymax=uci), width=.3) +
+  labs(y = "Assemblage similarity (Horn index)", x = "Historical samples (absolute Latitude)") +
+  theme_bw() + 
+  theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=18, colour = "black"),
+        legend.text = element_text(size=18, colour = "black"), 
+        legend.title = element_blank(),
+        legend.position = c(0.85, 0.15),
+        legend.background = element_rect(linetype="solid", colour ="black")) +
+  scale_color_manual(values=c("#a6611a", "#018571")) +
+  scale_shape_manual(values=c(19, 15))
 
