@@ -10,7 +10,6 @@ library(geosphere)
 library(SpadeR)
 
 # Auxiliary functions
-
 find_neighbours <- function(point, findin, distance) { # vector, data.frame, numeric
   ## point: vector of two numbers (longitude, latitude) 
   ## findin: a matrix of 2 columns (first one is longitude, second is latitude) 
@@ -166,73 +165,100 @@ row.names(historical_lgm) <- historical_lgm$variable
 historical_lgm <- historical_lgm[,-which(names(historical_lgm)=="variable")]
 
 
+holocene_lgm <- rbind(holocene_species,lgm_species)
+holocene_lgm <- melt(holocene_lgm, id = "sample")
+holocene_lgm <- cast(holocene_lgm, variable~sample)
+holocene_lgm <- holocene_lgm[,-grep(names(holocene_lgm), pattern = "A66")] # SimilarityPair can only be calculated for assemblages with more than ONE species
+row.names(holocene_lgm) <- holocene_lgm$variable
+holocene_lgm <- holocene_lgm[,-which(names(holocene_lgm)=="variable")]
+
 
 
 ###
 ### Analysis
 ###
 
-sim_samples <- paste(historical$sample[which(historical$sample!="A66")],"_", sep="") # SimilarityPair can only be calculated for assemblages with more than ONE species
-sim_holo <- data.frame()
-sim_lgm <- data.frame()
-
-for (i in sim_samples){ # i = sim_samples[1]
+if (!file.exists("similarity.csv")){
   
-   sim_holo_data <- historical_holocene[,grep(names(historical_holocene), pattern = i)]
-   sim_holo_i <- SimilarityPair(as.matrix(sim_holo_data), datatype = c("abundance"))
-   sim_holo <- rbind(sim_holo, 
-          cbind(rbind(c02 = sim_holo_i$Empirical_richness[1,],
-                      c12 = sim_holo_i$Empirical_relative[1,],
-                      c22 = sim_holo_i$Empirical_relative[2,]),
-          sample = rep(i, 3)))
-   
-   sim_lgm_data <- historical_lgm[,grep(names(historical_lgm), pattern = i)]
-   sim_lgm_i <- SimilarityPair(as.matrix(sim_lgm_data), datatype = c("abundance"))
-   sim_lgm <- rbind(sim_lgm, cbind(rbind(
-     c02 = sim_lgm_i$Empirical_richness[1,],
-     c12 = sim_lgm_i$Empirical_relative[1,],
-     c22 = sim_lgm_i$Empirical_relative[2,] ),
-     sample = rep(i, 3)))
+  sim_samples <- paste(historical$sample[which(historical$sample!="A66")],"_", sep="") # SimilarityPair can only be calculated for assemblages with more than ONE species
+  sim_holo <- data.frame()
+  sim_lgm <- data.frame()
+  sim_null <- data.frame()
+  
+  for (i in sim_samples){ # i = sim_samples[1]
+    
+    sim_holo_data <- historical_holocene[,grep(names(historical_holocene), pattern = i)]
+    sim_holo_i <- SimilarityPair(as.matrix(sim_holo_data), datatype = c("abundance"))
+    sim_holo <- rbind(sim_holo, 
+                      cbind(rbind(c02 = sim_holo_i$Empirical_richness[1,],
+                                  c12 = sim_holo_i$Empirical_relative[1,],
+                                  c22 = sim_holo_i$Empirical_relative[2,]),
+                            sample = rep(i, 3)))
+    
+    sim_lgm_data <- historical_lgm[,grep(names(historical_lgm), pattern = i)]
+    sim_lgm_i <- SimilarityPair(as.matrix(sim_lgm_data), datatype = c("abundance"))
+    sim_lgm <- rbind(sim_lgm, 
+                     cbind(rbind(c02 = sim_lgm_i$Empirical_richness[1,],
+                                 c12 = sim_lgm_i$Empirical_relative[1,],
+                                 c22 = sim_lgm_i$Empirical_relative[2,] ),
+                           sample = rep(i, 3)))
+    
+    sim_null_data <- holocene_lgm[,grep(names(holocene_lgm), pattern = i)]
+    sim_null_i <- SimilarityPair(as.matrix(sim_null_data), datatype = c("abundance"))
+    sim_null <- rbind(sim_null, 
+                     cbind(rbind(c02 = sim_null_i$Empirical_richness[1,],
+                                 c12 = sim_null_i$Empirical_relative[1,],
+                                 c22 = sim_null_i$Empirical_relative[2,] ),
+                           sample = rep(i, 3)))
+    
+    rm(sim_holo_data)
+    rm(sim_holo_i)
+    rm(sim_lgm_data)
+    rm(sim_lgm_i)
+    rm(sim_null_data)
+    rm(sim_null_i)
+    
+  }
+  
+  sim_holo[,c(1:4)] <- sapply(sim_holo[,c(1:4)], function(x) as.numeric(as.character(x)))
+  sim_lgm[,c(1:4)] <- sapply(sim_lgm[,c(1:4)], function(x) as.numeric(as.character(x)))
+  sim_null[,c(1:4)] <- sapply(sim_null[,c(1:4)], function(x) as.numeric(as.character(x)))
+  
+  sim_holo$age <- "Historical vs. Holocene"
+  sim_lgm$age <- "Historical vs. LGM"
+  sim_null$age <- "Holocene vs. LGM"
+  
+  similarity <- rbind(sim_holo,sim_lgm,sim_null)
+  similarity$CqN <- as.factor(rep(c(0:2), nrow(similarity)/3))
+  similarity$sample <- as.factor(sub("_", "", similarity$sample))
+  similarity$age <- as.factor(similarity$age)
+  similarity <- merge(similarity,historical[,c("sample", "Lat", "Long")])
+  names(similarity) <- c("sample","Estimate", "se", "lci", "uci", "age", "CqN", "lat", "long")
+  
+  write.csv(similarity, "similarity.csv", row.names = FALSE)
 
-   rm(sim_holo_data)
-   rm(sim_holo_i)
-   rm(sim_lgm_data)
-   rm(sim_lgm_i)
-   
+}else{
+  similarity <- read.csv("similarity.csv", header = TRUE)
 }
-
-sim_holo[,c(1:4)] <- sapply(sim_holo[,c(1:4)], function(x) as.numeric(as.character(x)))
-sim_lgm[,c(1:4)] <- sapply(sim_lgm[,c(1:4)], function(x) as.numeric(as.character(x)))
-
-sim_holo$age <- "Holocene"
-sim_lgm$age <- "LGM"
 
 
 ###
 ### Plot
 ###
 
-similarity <- rbind(sim_holo,sim_lgm)
-similarity$CqN <- as.factor(rep(c(0:2), nrow(similarity)/3))
-similarity$sample <- as.factor(sub("_", "", similarity$sample))
-similarity$age <- as.factor(similarity$age)
-similarity <- merge(similarity,historical[,c("sample", "Lat", "Long")])
-names(similarity) <- c("sample","Estimate", "se", "lci", "uci", "age", "CqN", "lat", "long")
+#sim_data <- similarity[which(similarity[,"CqN"] == 0),] # Sorensen index (richness)
+sim_data <- similarity[which(similarity[,"CqN"] == 1),] # Horn index (relative abundance, abundant)
+#sim_data <- similarity[which(similarity[,"CqN"] == 2),] # Morisita-Horn index (relative abundance, rare)
 
-sim_data <- similarity[which(similarity[,"CqN"] == 0),] # Sorensen index (richness)
-sim_data  <- similarity[which(similarity[,"CqN"] == 1),] # Horn index (relative abundance)
-sim_data <- similarity[which(similarity[,"CqN"] == 2),] # Morisita-Horn index (relative abundance)
-
+# Absolute Latitude 
 sim_data$abs_lat <- round(abs(sim_data$lat))
 sim_data <- sim_data[order(sim_data$abs_lat),]
 sim_data$abs_lat <- round(abs(sim_data$lat))
 sim_data$abs_lat <- as.factor(sim_data$abs_lat)
   
-# Absolute Latitude 
-
 ggplot(sim_data, aes(x=abs_lat, y=Estimate, shape=age, colour=age)) +
     geom_point(size=4)  + ylim(0,1) +
-    geom_errorbar(aes(ymin=lci, ymax=uci), width=.3) +
+    geom_errorbar(aes(ymin=lci, ymax=uci), width=.2) +
     labs(y = "Assemblage similarity", x = "Historical samples (absolute Latitude)") +
     theme_bw() + 
     theme(axis.text=element_text(size=18, colour = "black"), 
@@ -241,8 +267,8 @@ ggplot(sim_data, aes(x=abs_lat, y=Estimate, shape=age, colour=age)) +
           legend.title = element_blank(),
           legend.position = c(0.15, 0.15),
           legend.background = element_rect(linetype="solid", colour ="black")) +
-    scale_color_manual(values=c("#a6611a", "#018571")) +
-    scale_shape_manual(values=c(19, 15)) +
+    scale_color_manual(values=c("#a6611a", "#018571", "#999999")) +
+    scale_shape_manual(values=c(19, 15, 17)) +
     #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
     scale_x_discrete(labels=c(expression("1"*degree),
                               expression("8"*degree),
@@ -267,6 +293,6 @@ ggplot(sim_data, aes(x=sample, y=Estimate, shape=age, colour=age)) +
         legend.title = element_blank(),
         legend.position = c(0.85, 0.15),
         legend.background = element_rect(linetype="solid", colour ="black")) +
-  scale_color_manual(values=c("#a6611a", "#018571")) +
-  scale_shape_manual(values=c(19, 15))
+  scale_color_manual(values=c("#a6611a", "#018571", "#999999")) +
+  scale_shape_manual(values=c(19, 15, 17))
 
