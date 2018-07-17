@@ -113,6 +113,9 @@ max_diam <- by(size_ind_df$diam.max, size_ind_df$species, function(x) max(x, na.
 min_diam <- by(size_ind_df$diam.max, size_ind_df$species, function(x) min(x, na.rm = T))
 cbind(max_diam, min_diam)
 
+# Re-samples
+a_data <- size_pop_df[which(size_pop_df$datasetAB=="A"),]
+by(a_data$total_ind, a_data$species, sum)
 
 ###
 ### Analysis & Plots

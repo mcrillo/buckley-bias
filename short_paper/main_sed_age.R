@@ -73,9 +73,9 @@ data.frame(sample=historical$sample,
            sed_cm_ky=lgm$sedimentation.rate..cm.ky., 
            lgm=lgm$distance/1000,
            holocene=holocene$distance/1000, 
-           diff = (holocene$distance - lgm$distance)/1000)
+           dist_diff = (holocene$distance - lgm$distance)/1000)
 
-
+distances <- read.csv("distances_datasets.csv", header = T)
 
 ###
 ### Organizating data for analysis
@@ -353,7 +353,7 @@ morisita_horn <- ggplot(sim_data2, aes(x=abs_lat, y=Estimate, shape=comparison, 
   theme(axis.text=element_text(size=18, colour = "black"), 
         axis.title=element_text(size=22, colour = "black"),
         legend.text = element_text(size=18, colour = "black"), 
-        legend.title = element_blank(),
+        legend.title = element_text(size=18, colour = "black"), 
         legend.position = c(0.25, 0.15),
         legend.background = element_rect(linetype="solid", size = 0.4, colour ="black")) +
   scale_color_manual(values=c("#a6611a", "#018571","#999999")) +
@@ -430,6 +430,6 @@ chao_jaccard <- ggplot(sim_data_cj, aes(x=abs_lat, y=Estimate, shape=comparison,
 
 
 pdf(file = "fig_chao_jaccard.pdf", width=9, height=6, paper = "special")
-print(chao_jaccard)
+  print(chao_jaccard)
 dev.off()
 
