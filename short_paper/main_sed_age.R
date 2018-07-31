@@ -2,12 +2,13 @@
 rm(list=ls())
 
 setwd("/Users/marinacostarillo/Google Drive/PhD/Projects")
-setwd("./buckley-bias/analysis/short_paper")
+setwd("./buckley-bias/short_paper")
 
 # Libraries
 library(reshape)
 library(geosphere)
 library(SpadeR)
+library(ggplot2)
 
 # Auxiliary functions
 find_neighbours <- function(point, findin, distance) { # vector, data.frame, numeric
@@ -231,9 +232,9 @@ if (!file.exists("similarity.csv")){
   sim_lgm[,c(1:4)]  <- sapply(sim_lgm[,c(1:4)], function(x) as.numeric(as.character(x)))
   sim_null[,c(1:4)] <- sapply(sim_null[,c(1:4)], function(x) as.numeric(as.character(x)))
   
-  sim_holo$comparison <- "Historical vs. Holocene"
-  sim_lgm$comparison  <- "Historical vs. LGM"
-  sim_null$comparison <- "Holocene vs. LGM"
+  sim_holo$comparison <- "Historical and Holocene"
+  sim_lgm$comparison  <- "Historical and LGM"
+  sim_null$comparison <- "Holocene and LGM"
   
   similarity <- rbind(sim_holo,sim_lgm,sim_null)
   similarity$sample <- as.factor(sub("_", "", similarity$sample))
@@ -345,15 +346,17 @@ pdf(file = "fig_horn.pdf", width=9, height=6, paper = "special")
 dev.off()
 
 
+# Morista-Horn 
+sim_data2$comparison <- sub(pattern = "vs.", replacement = "and", x=sim_data2$comparison)
 morisita_horn <- ggplot(sim_data2, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison)) +
   geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
-  geom_point(position=position_dodge(width=0.5), size=4)  + ylim(0,1) +
-  labs(y = "Morisita-Horn index", x = "Samples (by absolute Latitude)") +
+  geom_point(position=position_dodge(width=0.5), size=4.5)  + ylim(0,1) +
+  labs(y = "Compositional similarity", x = "Samples (by absolute latitude)") +
   theme_bw() + 
-  theme(axis.text=element_text(size=18, colour = "black"), 
+  theme(axis.text=element_text(size=20, colour = "black"), 
         axis.title=element_text(size=22, colour = "black"),
         legend.text = element_text(size=18, colour = "black"), 
-        legend.title = element_text(size=18, colour = "black"), 
+        legend.title = element_blank(), 
         legend.position = c(0.25, 0.15),
         legend.background = element_rect(linetype="solid", size = 0.4, colour ="black")) +
   scale_color_manual(values=c("#a6611a", "#018571","#999999")) +
