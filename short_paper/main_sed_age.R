@@ -384,15 +384,14 @@ if (!file.exists("LGM_ForCenS_neighbours.csv")){
   forcens_lgm <- read.csv("LGM_ForCenS_neighbours.csv", header = TRUE)
 }
 
-median(forcens_lgm$distance)
-min(forcens_lgm$distance)
-max(forcens_lgm$distance)
+median(forcens_lgm$distance/1000)
 
 ### Preparing data
 
 # Creating species datasets by calculating relative abundance
-holocene_species <- (forcens_lgm[27:71]/rowSums(forcens_lgm[27:71], na.rm = T))*100
-lgm_species <- (lgm_full[17:54]/rowSums(lgm_full[17:54], na.rm = T))*100
+holocene_species <- (forcens_lgm[27:65]/rowSums(forcens_lgm[27:65], na.rm = T))*100
+lgm_species <- (lgm_full[,c(17:52,56:58)]/rowSums(lgm_full[,c(17:52,56:58)], na.rm = T))*100
+# data.frame(forcens = sort(names(forcens_lgm)[27:65]), lgm = sort(names(lgm_full)[c(17:52,56:58)]))
 
 # Removing unidentified
 holocene_species <- holocene_species[,-which(colnames(holocene_species)=="unidentified")]
