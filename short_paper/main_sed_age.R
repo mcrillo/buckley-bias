@@ -156,9 +156,15 @@ lgm_full$Globorotalia_ungulata <- 0
 # data.frame(forcens = sort(names(holocene_full)[22:59]), historical = sort(names(historical)[12:49]) , lgm = sort(names(lgm_full)[c(17:51,56:58)]))
 
 # (7) Transforming NA into 0
+names(lgm_full)[11] <- "sed_rate_cmky"
+any(lgm_full$sed_rate_cmky == 0, na.rm = T)
+
 holocene_full[is.na(holocene_full)] <- 0
 lgm_full[is.na(lgm_full)] <- 0
 historical[is.na(historical)] <- 0
+
+# Sed. rate of LGM back to NA
+lgm_full[which(lgm_full$sed_rate_cmky == 0),"sed_rate_cmky"] <- NA
 
 ###############################################
 
@@ -296,7 +302,7 @@ if (!file.exists("similarity.csv")){
   
   sim_holo$comparison <- "Historical and Holocene"
   sim_lgm$comparison  <- "Historical and LGM"
-  sim_null$comparison <- "Holocene and LGM"
+  sim_null$comparison <- "LGM and Holocene"
   
   similarity <- rbind(sim_holo,sim_lgm,sim_null)
   similarity$sample <- as.factor(sub("_", "", similarity$sample))
@@ -340,7 +346,7 @@ morisita_horn <- ggplot(sim_data2, aes(x=abs_lat, y=Estimate, shape=comparison, 
         legend.position = c(0.15, 0.12),
         legend.background = element_rect(linetype="solid", size = 0.4, colour ="black")) +
   scale_color_manual(values=c("#a6611a", "#018571","#999999")) +
-  scale_shape_manual(values=c(19, 15, 17)) +
+  scale_shape_manual(values=c(17, 15, 19)) +
   #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
   scale_x_discrete(labels=c(expression("0.7"*degree*S),
                             expression("7.6"*degree*S),
@@ -419,9 +425,9 @@ forcens_lgm <- forcens_lgm[,-which(names(forcens_lgm)=="variable")]
 forcens_lgm[1:10,1:10]
 
 
-### Similarity analysis
+############################ ERROR/PROBLEM with SimilarityPair function --> GitHub issue raised, have to run for loop "by hand"
+### Similarity analysis 
 # between local communities fo the Holocene and LGM
-
 sim_null <- data.frame()
 max_ssp <- 2
 for (i in 1:nrow(lgm_species)){ 
@@ -437,31 +443,36 @@ for (i in 1:nrow(lgm_species)){
 } # for
 i
 write.csv(sim_null, "LGM_ForCenS_sim_null.csv", row.names = F)
+sim_null <- read.csv("LGM_ForCenS_sim_null.csv", header = TRUE)
 
 lgm_forcens_sim <- sim_null # 'backing up' sim_null
 lgm_full$sample <- as.numeric(row.names(lgm_full)) # to be able to merge lat and long
-lgm_forcens_sim <- merge(lgm_forcens_sim,lgm_full[,c("sample", "Lat", "Long")])
-
+lgm_forcens_sim <- merge(lgm_forcens_sim,lgm_full[,c("sample", "Lat", "Long","sed_rate_cmky")])
 write.csv(lgm_forcens_sim, "LGM_ForCenS_c22.csv", row.names = FALSE)
+############################
+
+lgm_forcens_sim <- read.csv("LGM_ForCenS_c22.csv", header = TRUE)
+names(lgm_forcens_sim)
+
+
+### Plot LGM and Holocene similarity as function of sedimentation rate
+ggplot(data = lgm_forcens_sim, aes(y=c22, x=sed_rate_cmky)) + 
+  geom_point() +   # scale_x_log10() +
+  labs(y = "Compositional similarity", x = "Sedimentation rate (cm by ky)") +
+  theme_bw() + 
+  theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=20, colour = "black"))
+
+ggplot(data = lgm_forcens_sim, aes(y=c22, x=abs(Lat))) + 
+  geom_point() +   # scale_x_log10() +
+  labs(y = "Compositional similarity", x = "Absolute latitude") +
+  theme_bw() + 
+  theme(axis.text=element_text(size=18, colour = "black"), 
+        axis.title=element_text(size=20, colour = "black"))
+
+
 
 ### Plotting map of geographical similarity
-# lgm_forcens_sim <- read.csv("LGM_ForCenS_c22.csv", header = TRUE)
-names(lgm_forcens_sim)
-lgm_forcens_sim$similarity <- NA
-lgm_forcens_sim[which(lgm_forcens_sim$c22> 0.9),"similarity"] <- as.character("1.0 - 0.9")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.9 & lgm_forcens_sim$c22>0.8),"similarity"] <- as.character("0.9 - 0.8")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.8 & lgm_forcens_sim$c22>0.7),"similarity"] <- as.character("0.8 - 0.7")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.7 & lgm_forcens_sim$c22>0.6),"similarity"] <- as.character("0.7 - 0.6")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.6 & lgm_forcens_sim$c22>0.5),"similarity"] <- as.character("0.6 - 0.5")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.5 & lgm_forcens_sim$c22>0.4),"similarity"] <- as.character("0.5 - 0.4")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.4 & lgm_forcens_sim$c22>0.3),"similarity"] <- as.character("0.4 - 0.3")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.3 & lgm_forcens_sim$c22>0.2),"similarity"] <- as.character("0.3 - 0.2")
-lgm_forcens_sim[which(lgm_forcens_sim$c22<=0.2 & lgm_forcens_sim$c22>0.1),"similarity"] <- as.character("0.2 - 0.1")
-lgm_forcens_sim[which(lgm_forcens_sim$c22< 0.1),"similarity"] <- as.character("0.1 - 0.0")
-lgm_forcens_sim$similarity <- as.factor(lgm_forcens_sim$similarity)
-
-
-# plotting maps
 world <- map_data("world")
 mapplot <- ggplot(world, mapping = aes(x = long, y = lat, group = group)) +
   geom_polygon(fill = "grey60", colour = "grey60") +
@@ -494,20 +505,13 @@ mapplot <- ggplot(world, mapping = aes(x = long, y = lat, group = group)) +
                               expression("80"*degree*N))
   )
 
-mappoints_all <- mapplot + geom_point(data = lgm_forcens_sim[-which(lgm_forcens_sim$similarity=="1.0 - 0.9"),], aes(x = Long, y = Lat, group = sample, color = similarity),
-                                  size = 1, stroke = 0.5) + 
-                       scale_color_viridis(discrete=T)
-
-
-
 # Mean similarity for each lat long grid square
 lgm_forcens_sim <- function_name_grid(data = lgm_forcens_sim)
 sim_grid_mean <- data.frame(do.call("rbind", by(lgm_forcens_sim[,c("c22","Lat","Long")], lgm_forcens_sim$grid_name, function(x) colMeans(x, na.rm = T))))
 sim_grid_mean <- as.data.frame(cbind(sim_grid_mean, grid_name = row.names(sim_grid_mean)))
-length(which(sim_grid_mean$c22<0.75))
-
-
 names(sim_grid_mean)
+
+# Each 0.1
 sim_grid_mean$similarity <- NA
 sim_grid_mean[which(sim_grid_mean$c22> 0.9),"similarity"] <- as.character("1.0 - 0.9")
 sim_grid_mean[which(sim_grid_mean$c22<=0.9 & sim_grid_mean$c22>0.8),"similarity"] <- as.character("0.9 - 0.8")
@@ -520,15 +524,29 @@ sim_grid_mean[which(sim_grid_mean$c22<=0.3 & sim_grid_mean$c22>0.2),"similarity"
 sim_grid_mean[which(sim_grid_mean$c22<=0.2 & sim_grid_mean$c22>0.1),"similarity"] <- as.character("0.2 - 0.1")
 sim_grid_mean[which(sim_grid_mean$c22< 0.1),"similarity"] <- as.character("0.1 - 0.0")
 sim_grid_mean$similarity <- as.factor(sim_grid_mean$similarity)
-
 grey_gradient <- c('#000000','#1d1d1d','#353535','#4e4e4e','#696969','#858585','#a3a3a3','#c0c0c0','#dfdfdf','#ffffff')
+
+
+# Each 0.2
+sim_grid_mean$similarity <- NA
+sim_grid_mean[which(sim_grid_mean$c22> 0.8),"similarity"] <- as.character("0.8 - 1.0")
+sim_grid_mean[which(sim_grid_mean$c22<=0.8 & sim_grid_mean$c22>0.6),"similarity"] <- as.character("0.6 - 0.8")
+sim_grid_mean[which(sim_grid_mean$c22<=0.6 & sim_grid_mean$c22>0.4),"similarity"] <- as.character("0.4 - 0.6")
+sim_grid_mean[which(sim_grid_mean$c22<=0.4 & sim_grid_mean$c22>0.2),"similarity"] <- as.character("0.2 - 0.4")
+sim_grid_mean[which(sim_grid_mean$c22< 0.2),"similarity"] <- as.character("0.0 - 0.2")
+sim_grid_mean$similarity <- as.factor(sim_grid_mean$similarity)
+sim_grid_mean <- sim_grid_mean[order(sim_grid_mean$similarity, decreasing = T),]
+
+# gradient <- rev(c('#dddddd','#a9a9a9','#787878','#4c4c4c','#222222'))
+gradient <- c('#d7191c','#fdae61','#ffffbf','#abd9e9','#2c7bb6')
+
 mappoints <- mapplot + geom_point(data = sim_grid_mean, 
                                   aes(x = Long, y = Lat, group = grid_name, fill = similarity), 
-                                  color = "black", shape = 24,size = 4, stroke = 0.5) + 
-                       scale_fill_manual(values = grey_gradient, name = "Compositional similarity (Holocene and LGM)") +
+                                  color = "black", shape = 21,size = 4, stroke = 0.5) + 
+                       scale_fill_manual(values = gradient, name = "Compositional similarity (LGM and Holocene)") +
                        theme(legend.text=element_text(size=17),   
                              legend.direction = "horizontal", 
-                             legend.position = c(0.5, 0.06),
+                             legend.position = c(0.275, 0.078),
                              legend.box = "horizontal",
                              legend.title = element_text(size=18), 
                              legend.background = element_rect(linetype="solid", size = 0.4, colour ="black")) +
