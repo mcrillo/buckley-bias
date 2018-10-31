@@ -1,9 +1,6 @@
 # Created by Marina Costa Rillo in 05/July/2018 
 rm(list=ls())
 
-setwd("/Users/marinacostarillo/Google Drive/PhD/Projects")
-setwd("./buckley-bias/short_paper")
-
 # Libraries
 library(reshape)
 library(geosphere)
@@ -13,6 +10,7 @@ library(viridis)
 library(dplyr)
 library(ggpubr)
 library(lme4)
+library(xtable)     # prints table in Latex format
 
 
 # Auxiliary functions
@@ -98,14 +96,16 @@ function_name_grid <- function(data){
 }
 
 
-
 ###
 ### Data
 ###
 
+
+setwd("/Users/marinacostarillo/Google Drive/PhD/Projects/buckley-bias/short_paper")
 historical <- read.csv("historical_data.csv", header = TRUE)
 holocene_full <- read.csv("ForCenS_woa.csv", header = TRUE)
 lgm_full <- read.csv("LGM_MARGO_renamed.csv", header = TRUE)
+
 
 ###############################################
 ### Solving species names in the 3 datasets ###
@@ -157,18 +157,24 @@ lgm_full$Globorotalia_ungulata <- 0
 # data.frame(forcens = sort(names(holocene_full)[22:59]), historical = sort(names(historical)[12:49]) , lgm = sort(names(lgm_full)[c(17:51,56:58)]))
 
 # (7) Transforming NA into 0
-names(lgm_full)[11] <- "sed_rate_cmky"
-any(lgm_full$sed_rate_cmky == 0, na.rm = T)
-
-holocene_full[is.na(holocene_full)] <- 0
-lgm_full[is.na(lgm_full)] <- 0
 historical[is.na(historical)] <- 0
+holocene_full[is.na(holocene_full)] <- 0
 
+names(lgm_full)[11] <- "sed_rate_cmky"
+if(!any(lgm_full$sed_rate_cmky == 0, na.rm = T)){
+ lgm_full[is.na(lgm_full)] <- 0
+}
 # Sed. rate of LGM back to NA
 lgm_full[which(lgm_full$sed_rate_cmky == 0),"sed_rate_cmky"] <- NA
 
 ###############################################
+# Saving SEDIMENTATION RATE data
 
+sed_rate_lgm <- lgm_full[!is.na(lgm_full$sed_rate_cmky), c("Core", "Lat", "Long", "Water.depth..m.","Ocean", "sed_rate_cmky",
+                                           "calendar.age.estimate..cal.ky.BP.","Sample.depth...upper..m.","Sample.depth...lower..m.")]
+mean(sed_rate_lgm$sed_rate_cmky)
+
+###############################################
 
 # Historical samples subset
 
@@ -198,10 +204,120 @@ if (!file.exists("ForCenS_historical_subset.csv") | !file.exists("LGM_historical
   holocene <- read.csv("ForCenS_historical_subset.csv", header = TRUE)
   lgm <- read.csv("LGM_historical_subset.csv", header = TRUE)
 }
+mean(holocene$distance/1000)
+median(holocene$distance/1000)
+
+#####################################
+### Checking SST among neighbours ###
+#####################################
+
+# Finding WOA temperature for neighbouring points, to see if there are large differences because of distance
+if (!file.exists("SST_neighbours.csv")){
+  
+  setwd("/Users/marinacostarillo/Google Drive/PhD/projects/competition-forams/data/ocean")
+  tmn <- read.csv("woa13_decav_t00mn01v2.csv", header = T,stringsAsFactors = FALSE)
+  tsd <- read.csv("woa13_decav_t00sd01v2.csv", header = T,stringsAsFactors = FALSE)
+  setwd("/Users/marinacostarillo/Google Drive/PhD/Projects/buckley-bias/short_paper")
+  
+  neighb <- historical[,c("sample", "Museum_no", "Lat", "Long")]
+  neighb$distance <- 0
+  neighb$age <- c("Historical")
+  
+  neighb_holocene <- holocene[,c("sample", "Sample_ID", "Latitude", "Longitude", "distance")]
+  neighb_holocene$age <- c("Holocene")
+  
+  neighb_lgm <- lgm[,c("sample", "Core", "Lat", "Long", "distance")]
+  neighb_lgm$age <- c("LGM")
+  
+  names(neighb) <- names(neighb_holocene) <- names(neighb_lgm) <- c("sample", "Sample_Core_no", "Latitude", "Longitude", "distance", "age")
+  neighb <- rbind(neighb, rbind(neighb_holocene,neighb_lgm))
+  neighb <- neighb[order(neighb[,c("sample")]),]
+  
+  for(j in 1:nrow(neighb)){
+    print(neighb[j, "sample"])
+    point <- neighb[j,c("Longitude","Latitude")]
+    
+    woa_mn <- find_neighbours(point, findin = tmn[,c("Long","Lat")], distance = 0)
+    woa_sd <- find_neighbours(point, findin = tsd[,c("Long","Lat")], distance = 0)
+    
+    neighb[j,"woamn"] <- mean(tmn[woa_mn$row_findin,"X0"], na.rm = T)
+    neighb[j,"woasd"] <- mean(tsd[woa_sd$row_findin,"X0"], na.rm = T)
+    neighb[j,"woamn_dist_km"] <-mean( woa_mn$distance, na.rm = T)
+    neighb[j,"woasd_dist_km"] <- mean(woa_sd$distance, na.rm = T)
+  }
+  write.csv(neighb, "SST_neighbours.csv", row.names = F)
+}else{
+  neighb <- read.csv("SST_neighbours.csv", header = TRUE)
+}
+
+# neighb 
+
+# Large SST differences for sample M.8780
+neighb[which(neighb$sample=="A10"),]
+
+# Find other ForCenS neighbours, within 500 km radius
+new_neighb <- find_neighbours(point = neighb[which(neighb$sample=="A10" & neighb$age=="Historical"),c("Longitude","Latitude")], 
+                              findin = holocene_full[,c("Longitude","Latitude")], distance = 500000)
+
+# new neighbour of M.8780: the one with least SST difference
+new_neighb <- new_neighb[which.min(abs(neighb[which(neighb$sample=="A10" & neighb$age=="Historical"),"woamn"] - 
+                                         holocene_full[new_neighb$row_findin,"woa_tmn"])),]
+new_holocene_neighb <- cbind(sample = "A10", new_neighb, holocene_full[new_neighb$row_findin,])
+
+# Substitute nearest neighbour with neighbour with more similar SST
+if(all(colnames(holocene) == colnames(new_holocene_neighb))){
+  holocene <- rbind(holocene, new_holocene_neighb)
+  sst_remove <- holocene[which(holocene$sample=="A10"),"woa_tmn"][which.max(abs(neighb[which(neighb$sample=="A10" & neighb$age=="Historical"),"woamn"] - holocene[which(holocene$sample=="A10"),"woa_tmn"]))]
+  holocene <- holocene[-which(holocene$sample=="A10" & holocene$woa_tmn == sst_remove),]
+}
+
+
+neighb_new_holocene <- new_holocene_neighb[,c("sample", "Sample_ID", "Latitude", "Longitude", "distance")]
+neighb_new_holocene$age <- c("Holocene")
+neighb_new_holocene <- cbind(neighb_new_holocene,new_holocene_neighb[,c("woa_tmn","woa_tsd","woa_dist","woa_dist")])
+names(neighb_new_holocene) <- c("sample", "Sample_Core_no", "Latitude", "Longitude", "distance", "age","woamn","woasd" ,"woamn_dist_km","woasd_dist_km")
+
+neighb <- rbind(neighb,neighb_new_holocene)
+neighb$lsd <- neighb$woamn - neighb$woasd
+neighb$usd <- neighb$woamn + neighb$woasd
+
+
+pdf("si_fig_sst_diff.pdf", paper = "special",  width = 10, height = 5)
+ggplot(neighb, aes(x=sample, y=woamn, shape=age, colour=age)) +
+  geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lsd, ymax=usd), width=.2) +
+  geom_point(position=position_dodge(width=0.5), size=4.5) +
+  theme_bw() + 
+  theme(plot.margin = margin(20, 5.5, 20, 5.5, "pt"),
+        axis.text=element_text(size=16, colour = "black"), 
+        axis.title=element_text(size=20, colour = "black"),
+        legend.text = element_text(size=16, colour = "black"), 
+        legend.title = element_blank(), 
+        legend.position = c(0.5, 0.15),
+        legend.background = element_rect(linetype="solid", size = 0.4, colour ="black")) +
+  scale_color_manual(values=c("#e41a1c", "#4daf4a","#377eb8")) +
+  scale_shape_manual(values=c(17, 15, 19)) +
+  scale_y_continuous(name="Mean annual SST", breaks = seq(5, 30, by = 5),limits=c(4.5, 30.5)) +
+  scale_x_discrete(name="Historical sites and corresponding neighbours", 
+                   labels=c("A10" = "M.8780", 
+                            "A20" = "M.5246",
+                            "A25" = "M.408",
+                            "A27" = "M.3787",
+                            "A31" = "M.4080",
+                            "A44" = "M.7487",
+                            "A46" = "M.284",
+                            "A5" =  "M.192",
+                            "A55" = "M.25"))
+dev.off()
+
+
+neighb <- neighb[-which(neighb$Sample_Core_no == "CLIMAP_0070"),]
+neighb <- neighb[order(neighb$sample),]
+write.csv(neighb, "SST_new_neighbours.csv", row.names = F)
+
 
 # Distance (in km) between historical sample and LGM and ForCenS nearest sample
-median(holocene$distance/1000)
-median(unique(lgm$distance)/1000)
+round(mean(holocene$distance/1000),0)
+round(mean(unique(lgm$distance)/1000),0)
 
 
 ###
@@ -236,12 +352,23 @@ historical_lgm <- cast(historical_lgm, variable~sample)
 row.names(historical_lgm) <- historical_lgm$variable
 historical_lgm <- historical_lgm[,-which(names(historical_lgm)=="variable")]
 
+
 holocene_lgm <- rbind(holocene_species,lgm_species)
 holocene_lgm <- melt(holocene_lgm, id = "sample")
 holocene_lgm <- aggregate(value~variable+sample, data=holocene_lgm, FUN=function(x) mean=mean(x))
 holocene_lgm <- cast(holocene_lgm, variable~sample)
 row.names(holocene_lgm) <- holocene_lgm$variable
 holocene_lgm <- holocene_lgm[,-which(names(holocene_lgm)=="variable")]
+
+
+### SI TABLES
+table_rel_abund <- cbind(historical_holocene, historical_lgm[,grep("lgm", colnames(historical_lgm))])
+table_rel_abund <- table_rel_abund[order(row.names(table_rel_abund)),]
+table_rel_abund <- table_rel_abund[,order(colnames(table_rel_abund))]
+# write.csv(table_rel_abund, "table_rel_abund.csv")
+
+# si_table <- read.csv(file= "si_table_raw_counts.csv",stringsAsFactors = FALSE)
+# print(xtable(si_table), include.rownames=F) # LaTeX
 
 
 ###
@@ -338,21 +465,15 @@ binom.test(8, 9, p = .5, "two.sided")$p.value
 ### Historical samples plot
 ###
 
-sim_data2$abs_lat <- round(abs(sim_data2$lat))
-sim_data2 <- sim_data2[order(sim_data2$abs_lat),]
-sim_data2$abs_lat <- round(abs(sim_data2$lat))
-sim_data2$abs_lat <- as.factor(sim_data2$abs_lat)
-
-
 # Morista-Horn 
 sim_data2$comparison <- sub(pattern = "vs.", replacement = "and", x=sim_data2$comparison)
-morisita_horn <- ggplot(sim_data2, aes(x=abs_lat, y=Estimate, shape=comparison, colour=comparison)) +
+morisita_horn <- ggplot(sim_data2, aes(x=sample, y=Estimate, shape=comparison, colour=comparison)) +
   geom_errorbar(position=position_dodge(width=0.5), aes(ymin=lci, ymax=uci), width=.2) +
   geom_point(position=position_dodge(width=0.5), size=4.5)  + ylim(0,1) +
-  labs(y = "Compositional similarity", x = "Historical samples (by absolute latitude)") +
+  labs(y = "Compositional similarity", x = "Historical samples") +
   theme_bw() + 
   theme(plot.margin = margin(20, 5.5, 20, 5.5, "pt"),
-        axis.text=element_text(size=18, colour = "black"), 
+        axis.text=element_text(size=16, colour = "black"), 
         axis.title=element_text(size=20, colour = "black"),
         legend.text = element_text(size=18, colour = "black"), 
         legend.title = element_blank(), 
@@ -361,15 +482,15 @@ morisita_horn <- ggplot(sim_data2, aes(x=abs_lat, y=Estimate, shape=comparison, 
   scale_color_manual(values=c("#a6611a", "#018571","#999999")) +
   scale_shape_manual(values=c(17, 15, 19)) +
   #scale_y_continuous(breaks = seq(0,1,0.25),limits=c(0,1), expand = c(0.02, 0)) +                         
-  scale_x_discrete(labels=c(expression("0.7"*degree*S),
-                            expression("7.6"*degree*S),
-                            expression("15.6"*degree*S),
-                            expression("19.6"*degree*S),
-                            expression("21.2"*degree*S),
-                            expression("24.3"*degree*N),
-                            expression("26.9"*degree*S),
-                            expression("40.4"*degree*S),
-                            expression("50"*degree*S)))
+  scale_x_discrete(labels=c("A10" = "M.8780", 
+                            "A20" = "M.5246",
+                            "A25" = "M.408",
+                            "A27" = "M.3787",
+                            "A31" = "M.4080",
+                            "A44" = "M.7487",
+                            "A46" = "M.284",
+                            "A5" =  "M.192",
+                            "A55" = "M.25"))
 
 png(file = "fig_morisita-horn.png", width = 11.5, height = 7, units = "in", res = 300)
 print(morisita_horn)
@@ -570,6 +691,23 @@ dev.off()
 
 
 # Final Figure 1
-jpeg(file = "figure_1.jpeg", width=11.5, height=15, units = "in", res = 300)
+png(file = "figure_1.png", width=11.5, height=15, units = "in", res = 300)
 print(ggarrange(morisita_horn, mappoints_all, ncol = 1, nrow = 2, align="v"))
+dev.off()
+
+
+# Sedimentation rate
+sim_sed <- merge(lgm_forcens_sim_mean,
+                 lgm_full[,c("Lat", "Long","Core","Water.depth..m.", "Ocean", "sed_rate_cmky")],
+                 all.y=F)
+sim_sed <- unique(sim_sed[,c("c22","Lat", "Long","Core","Water.depth..m.", "Ocean", "sed_rate_cmky")])
+
+
+png(file = "si_fig_sed_rate.png", width = 12, height = 5, units = "in", res = 300)
+ggplot(sim_sed, aes(x=sed_rate_cmky, y=c22)) +
+  geom_point(size=2, pch = 21, stroke = 1, fill = alpha("blue",0.3)) + xlim(0,20) +
+  labs(y = "Compositional similarity (LGM vs. Holocene)", x = "Sedimentation rate (cm/ky)") +
+  theme_bw() +
+  theme(axis.text=element_text(size=14, colour = "black"), 
+        axis.title=element_text(size=16, colour = "black"))
 dev.off()
