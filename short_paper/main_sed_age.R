@@ -701,10 +701,10 @@ sim_sed <- merge(lgm_forcens_sim_mean,
                  lgm_full[,c("Lat", "Long","Core","Water.depth..m.", "Ocean", "sed_rate_cmky")],
                  all.y=F)
 sim_sed <- unique(sim_sed[,c("c22","Lat", "Long","Core","Water.depth..m.", "Ocean", "sed_rate_cmky")])
-
+sed_data <- sim_sed[which(!is.na(sim_sed$c22) & !is.na(sim_sed$sed_rate_cmky)),]
 
 png(file = "si_fig_sed_rate.png", width = 12, height = 5, units = "in", res = 300)
-ggplot(sim_sed, aes(x=sed_rate_cmky, y=c22)) +
+ggplot(sed_data, aes(x=sed_rate_cmky, y=c22)) +
   geom_point(size=2, pch = 21, stroke = 1, fill = alpha("blue",0.3)) + xlim(0,20) +
   labs(y = "Compositional similarity (LGM vs. Holocene)", x = "Sedimentation rate (cm/ky)") +
   theme_bw() +
