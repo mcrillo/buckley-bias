@@ -321,7 +321,7 @@ round(mean(unique(lgm$distance)/1000),0)
 
 
 ###
-### Organizating data for analysis
+### Organizating data for compositional analysis
 ###
 # data.frame(sort(names(holocene[,25:63])), sort(names(lgm[,c(20:55,59:61)])))
 # Calculating relative abundance within each assemblage
@@ -528,6 +528,7 @@ dim(forcens_lgm)
 dim(unique(forcens_lgm[,c("lgm_lat", "lgm_long", "distance")]))
 unique_lgm <- unique(forcens_lgm[,c("lgm_lat", "lgm_long", "distance")])
 median(unique_lgm$distance/1000) # km
+mean(unique_lgm$distance/1000) # km
 
 ### Preparing data
 
