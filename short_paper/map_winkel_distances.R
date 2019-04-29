@@ -80,5 +80,21 @@ dev.off()
 
 
 
+png("fig_map_samples.png", units = "in",  width = 10, height = 6, res = 400)
+
+par(mar = c(0, 0, 0, 0))
+plot(methods::as(world, 'Spatial'), expandBB=c(0,0,0.1,0))
+
+plot(grid.lines.mi, col=grey(0.9), add=T)
+plot(grid.lines.mj, col=grey(0.4), add=T)
+
+plot(world, add=TRUE, border=grey(0.6), col=grey(0.6))
+plot(historical_coords, add=TRUE, col="black", bg="#e41a1c", pch=21, cex = 2, lwd = 1.5)
+
+text(labels(grid.lines.mj, side=c(2), labelCRS = CRS("+init=epsg:4326")), col = grey(.4), offset=0.5, cex = 1.5)
+dev.off()
+
+
+
 ###
 
