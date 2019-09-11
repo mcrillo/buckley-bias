@@ -1,12 +1,9 @@
-# Quantifying biases in museum collections
+### Messy code and data for the analysis in the publication:
 
-Henry Buckley Collection of Planktonic Foraminifera
+Rillo MC, Kucera M, Ezard THG and Miller CG (2019) Surface Sediment Samples From Early Age of Seafloor Exploration Can Provide a Late 19th Century Baseline of the Marine Environment. Front. Mar. Sci. 5:517. DOI: [https://doi.org/10.3389/fmars.2018.00517](https://doi.org/10.3389/fmars.2018.00517) 
 
-The two main potential sources of bias are taxonomic bias (systematic misidentification or incomplete representation of the assemblage) and size bias (bias towards larger specimens or larger lineages). The recognition of the biases in the Buckley collection will be placed together with the collection at the NHMUK Data Portal, and will be valuable for other researchers that want to use it in the future.
+The data and the (cleaned) R code used to produce this analysis are available from the NHM Data Portal: [https://doi.org/10.5519/000193](https://doi.org/10.5519/000193)
 
-Dataset at NHMUK Data Portal (open-access): [Marina Costa Rillo (2016) http://dx.doi.org/10.5519/0035055](http://dx.doi.org/10.5519/0035055)
-
-Publication (open-access): [Marina C. Rillo, John Whittaker, Thomas HG Ezard, Andy Purvis, Andrew S. Henderson, Stephen Stukins, and C. Giles Miller (2016). "The unknown planktonic foraminiferal pioneer Henry A. Buckley and his collection at The Natural History Museum, London." *Journal of Micropalaeontology*: jmpaleo2016-020](http://dx.doi.org/10.1144/jmpaleo2016-020)
 
 
 
